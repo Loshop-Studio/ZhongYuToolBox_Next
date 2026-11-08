@@ -20,6 +20,7 @@ jobs:
       - name: Create or update PR and try to merge it
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           HEAD_BRANCH: ${{ github.ref_name }}
         run: |
           set -euo pipefail
