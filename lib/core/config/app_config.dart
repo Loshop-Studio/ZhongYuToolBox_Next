@@ -3,7 +3,7 @@ class AppConfig {
   AppConfig._();
 
   static const String appName = '中育Toolbox';
-  static const String appVersion = '1.0.0';
+  static const String appVersion = '1.0.5';
 
   /// 学校发现网关
   static const String discoveryBase =
