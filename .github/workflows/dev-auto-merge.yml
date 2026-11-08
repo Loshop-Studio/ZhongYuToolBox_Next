@@ -1,0 +1,42 @@
+name: Merge developer branches into dev
+
+on:
+  push:
+    branches:
+      - 'dev_*'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: merge-developer-branches
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create or update PR and try to merge it
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          HEAD_BRANCH: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$HEAD_BRANCH" =~ ^dev_[A-Za-z0-9._-]+$ ]]; then
+            echo "Unexpected developer branch name: $HEAD_BRANCH" >&2
+            exit 1
+          fi
+
+          pr_number=$(gh pr list --base dev --head "$HEAD_BRANCH" --state open --json number --jq '.[0].number // empty')
+          if [[ -z "$pr_number" ]]; then
+            pr_url=$(gh pr create \
+              --base dev \
+              --head "$HEAD_BRANCH" \
+              --title "Merge $HEAD_BRANCH into dev" \
+              --body "Automatically created after a push to \`$HEAD_BRANCH\`. This workflow will try to merge it into \`dev\`.")
+            pr_number=${pr_url##*/}
+          fi
+
+          gh pr merge "$pr_number" --merge

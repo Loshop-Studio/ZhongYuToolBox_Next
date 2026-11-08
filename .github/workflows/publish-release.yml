@@ -1,0 +1,132 @@
+name: Build and publish release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - pubspec.yaml
+      - lib/core/config/app_config.dart
+      - assets/changelog.json
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build windows --release
+      - name: Package Windows build
+        shell: pwsh
+        run: |
+          $version = (Select-String -Path pubspec.yaml -Pattern '^version:\s*(\S+)' | ForEach-Object { $_.Matches[0].Groups[1].Value.Split('+')[0] })
+          Compress-Archive -Path 'build/windows/x64/runner/Release/*' -DestinationPath "zhongyu-toolbox-windows-v$version.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: zhongyu-toolbox-windows-v*.zip
+          if-no-files-found: error
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - name: Name APK
+        run: |
+          version=$(sed -n 's/^version: *\([0-9.]*\)+.*/\1/p' pubspec.yaml)
+          test -n "$version"
+          cp build/app/outputs/flutter-apk/app-release.apk "zhongyu-toolbox-android-v${version}.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-release
+          path: zhongyu-toolbox-android-v*.apk
+          if-no-files-found: error
+
+  ios-unsigned:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
+      - name: Package unsigned IPA
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(sed -n 's/^version: *\([0-9.]*\)+.*/\1/p' pubspec.yaml)
+          test -n "$version"
+          mkdir -p ipa/Payload
+          ditto build/ios/iphoneos/Runner.app ipa/Payload/Runner.app
+          (cd ipa && ditto -c -k --sequesterRsrc --keepParent Payload "../zhongyu-toolbox-ios-v${version}-unsigned.ipa")
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-unsigned-release
+          path: zhongyu-toolbox-ios-v*-unsigned.ipa
+          if-no-files-found: error
+
+  release:
+    runs-on: ubuntu-latest
+    needs:
+      - windows
+      - android
+      - ios-unsigned
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Create GitHub Release and upload artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          version=$(sed -n 's/^version: *\([0-9.]*\)+.*/\1/p' pubspec.yaml)
+          tag="v${version}"
+          notes=$(node -e "const c=require('./assets/changelog.json').changelog; const e=c.find(x=>x.version==='${version}'); if(!e) process.exit(2); process.stdout.write(e.text)")
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release edit "$tag" --title "$tag" --notes "$notes"
+          else
+            gh release create "$tag" --title "$tag" --notes "$notes" --target "$GITHUB_SHA"
+          fi
+          gh release upload "$tag" dist/* --clobber
+
+      - name: Sync release commit back to dev
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          ahead=$(gh api "repos/$REPOSITORY/compare/dev...main" --jq '.ahead_by')
+          if [[ "$ahead" == "0" ]]; then
+            echo "dev already contains main"
+            exit 0
+          fi
+
+          pr_number=$(gh pr list --base dev --head main --state open --json number --jq '.[0].number // empty')
+          if [[ -z "$pr_number" ]]; then
+            pr_url=$(gh pr create \
+              --base dev \
+              --head main \
+              --title "Sync release metadata from main" \
+              --body "Automatically sync the published version and changelog back to dev.")
+            pr_number=${pr_url##*/}
+          fi
+          gh pr merge "$pr_number" --merge
