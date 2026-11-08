@@ -35,10 +35,9 @@ class _AboutPageState extends State<AboutPage> {
 
   Future<void> _startBackgroundMusic() async {
     try {
-      final media = Media('asset:///assets/about_theme.aac');
-      await _backgroundPlayer.open(media);
+      await _backgroundPlayer.open(Media('asset:///assets/about_theme.aac'));
     } catch (_) {
-      // 资源未随旧构建产物更新时，不阻塞关于页打开。
+      // 音乐资源不可用时不影响关于页。
     }
   }
 
