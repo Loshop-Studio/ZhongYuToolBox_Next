@@ -33,13 +33,8 @@ const String jsToJavaBridgeScript = '''
 })();
 ''';
 
-/// 把在线专栏页面里的 `<video>` 连同外层 `.media-wrap.video-wrap` 一起替换成附件卡片：
-/// 整块容器换成 `div.easy-editor-upload__wrapper`，不留下空的播放器外壳。
-/// 页面没这个包裹层时退回只替换 `<video>` 本身。
-///
-/// 把在线专栏页面里的 `<video>` **整个节点**替换成官方编辑器输出的附件卡片：
-/// 外层包 `<div class="easy-editor-upload pdf-wrapper" data-url="...">`，
-/// 内层为 `<div class="easy-editor-upload__wrapper">` + `ic_video` + 内联 `onclick` 的 `<a>视频</a>`。
+/// 把在线专栏页面里的 `<video>` / `<audio>` 连同媒体包裹层一起替换成附件卡片。
+/// 视频使用 `ic_video`，音频使用 `ic_audio`；有包裹层时替换整个容器，避免留下空播放器。
 ///
 /// onclick 里的 URL 用视频自身的 src（mp4）；模板中 `'pdf' === 'html'` 恒假，
 /// 实际走 `window.JsToJava.open_file(url)`，Flutter 侧进入原生播放器并支持下载。
@@ -48,14 +43,17 @@ const String jsToJavaBridgeScript = '''
 /// MutationObserver 兜住 SPA 路由切换后的重新渲染，回调做了 60ms 合并。
 const String columnVideoReplaceScript = r'''
 (function () {
-  function build(url) {
+  function build(url, type) {
     var safe = String(url).replace(/'/g, '%27');
+    var isAudio = type === 'audio';
+    var icon = isAudio ? 'ic_audio' : 'ic_video';
+    var label = isAudio ? '音频' : '视频';
     var html =
       '<div class="easy-editor-upload pdf-wrapper" data-url="' + safe + '">' +
         '<div class="easy-editor-upload__wrapper">' +
-          '<i class="easy-editor-icon ic_video"></i>' +
+          '<i class="easy-editor-icon ' + icon + '"></i>' +
           '<div class="easy-editor-upload__name">' +
-          '<a onclick="if(window.JsToJava &amp;&amp; \'pdf\' === \'html\') {window.JsToJava.open_html(\'' + safe + '\')} else if(window.JsToJava) {window.JsToJava.open_file(\'' + safe + '\')}else {window.open(\'' + safe + '\')}">视频</a>' +
+          '<a onclick="if(window.JsToJava &amp;&amp; \'pdf\' === \'html\') {window.JsToJava.open_html(\'' + safe + '\')} else if(window.JsToJava) {window.JsToJava.open_file(\'' + safe + '\')}else {window.open(\'' + safe + '\')}">' + label + '</a>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -64,41 +62,45 @@ const String columnVideoReplaceScript = r'''
     return holder.firstChild;
   }
 
-  // 往上找 .media-wrap.video-wrap，整块一起换掉
-  function wrapperOf(video) {
-    var node = video;
+  function wrapperOf(media, type) {
+    var node = media;
+    var wrapperClass = type === 'audio' ? 'audio-wrap' : 'video-wrap';
     while (node && node !== document.body) {
       if (node.classList &&
           node.classList.contains('media-wrap') &&
-          node.classList.contains('video-wrap')) {
+          node.classList.contains(wrapperClass)) {
         return node;
       }
       node = node.parentElement;
     }
-    return video;
+    return media;
   }
 
-  function replace() {
-    var videos = document.querySelectorAll('video');
-    for (var i = 0; i < videos.length; i++) {
-      var video = videos[i];
-      if (video.getAttribute('data-zy-replaced')) continue;
+  function replaceMedia(type) {
+    var medias = document.querySelectorAll(type);
+    for (var i = 0; i < medias.length; i++) {
+      var media = medias[i];
+      if (media.getAttribute('data-zy-replaced')) continue;
 
-      var src = video.getAttribute('src') || '';
+      var src = media.getAttribute('src') || '';
       if (!src) {
-        var source = video.querySelector('source');
+        var source = media.querySelector('source');
         if (source) src = source.getAttribute('src') || '';
       }
       if (!src) continue;
 
-      var target = wrapperOf(video);
+      var target = wrapperOf(media, type);
       if (target.getAttribute('data-zy-replaced')) continue;
       if (!target.parentNode) continue;
 
       target.setAttribute('data-zy-replaced', '1');
-      var card = build(src);
-      target.parentNode.replaceChild(card, target);
+      target.parentNode.replaceChild(build(src, type), target);
     }
+  }
+
+  function replace() {
+    replaceMedia('video');
+    replaceMedia('audio');
   }
 
   replace();

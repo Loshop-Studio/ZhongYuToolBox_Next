@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdfx/pdfx.dart';
 
@@ -37,7 +39,9 @@ class _PdfDocumentViewState extends State<PdfDocumentView> {
   double _scale = 1;
   double _gestureScale = 1;
   double _renderWidth = 800;
+  double _devicePixelRatio = 1;
   double? _pinchStartDistance;
+  PdfControllerPinch? _mobileController;
   int _currentPage = 1;
   bool _loading = true;
   double _progress = 0;
@@ -67,6 +71,7 @@ class _PdfDocumentViewState extends State<PdfDocumentView> {
   void dispose() {
     _scroll.removeListener(_onScroll);
     _scroll.dispose();
+    _mobileController?.dispose();
     final document = _document;
     _document = null;
     document?.close();
@@ -103,6 +108,12 @@ class _PdfDocumentViewState extends State<PdfDocumentView> {
         await document.close();
         return;
       }
+      final mobileController = PdfControllerPinch(
+        document: Future<PdfDocument>.value(document),
+      );
+      final oldMobileController = _mobileController;
+      _mobileController = mobileController;
+      oldMobileController?.dispose();
       setState(() {
         _document = document;
         _documentId = document.id;
@@ -144,14 +155,15 @@ class _PdfDocumentViewState extends State<PdfDocumentView> {
 
   /// 按需渲染单页（带缓存），排队执行避免平台端并发渲染
   Future<PdfPageImage> _renderPage(int pageNumber, double width) {
-    final key = '$pageNumber@${width.round()}';
+    final pixelWidth = (width * _devicePixelRatio).roundToDouble();
+    final key = '$pageNumber@${pixelWidth.round()}';
     final cached = _renderCache[key];
     if (cached != null) return cached;
     // 只保留最近的渲染任务，避免翻过很多页后缓存无限增长
     while (_renderCache.length >= 24) {
       _renderCache.remove(_renderCache.keys.first);
     }
-    final task = _render(pageNumber, width);
+    final task = _render(pageNumber, pixelWidth);
     _renderCache[key] = task;
     return task;
   }
@@ -165,8 +177,7 @@ class _PdfDocumentViewState extends State<PdfDocumentView> {
         final image = await page.render(
           width: width,
           height: width * page.height / page.width,
-          format: PdfPageImageFormat.jpeg,
-          quality: 82,
+          format: PdfPageImageFormat.png,
           backgroundColor: '#FFFFFF',
         );
         if (image == null) throw StateError('第 $pageNumber 页渲染失败');
@@ -179,15 +190,36 @@ class _PdfDocumentViewState extends State<PdfDocumentView> {
     return task;
   }
 
+  void _setScalePreservingPosition(double next) {
+    if ((next - _scale).abs() < 0.001) return;
+    final oldExtent = _itemExtent;
+    final oldOffset = _scroll.hasClients ? _scroll.offset : 0.0;
+    final pageIndex = (oldOffset / oldExtent).floor();
+    final pageProgress = (oldOffset - pageIndex * oldExtent) / oldExtent;
+    setState(() => _scale = next);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scroll.hasClients) return;
+      final target = (pageIndex + pageProgress) * _itemExtent;
+      _scroll.jumpTo(target.clamp(0.0, _scroll.position.maxScrollExtent));
+    });
+  }
+
   void _zoomBy(double factor) {
     final next = (_scale * factor).clamp(_minScale, _maxScale);
-    if ((next - _scale).abs() < 0.001) return;
-    setState(() => _scale = next);
+    _setScalePreservingPosition(next);
   }
 
   void _resetZoom() {
-    if (_scale == 1) return;
-    setState(() => _scale = 1);
+    _setScalePreservingPosition(1);
+  }
+
+  void _onPointerSignal(PointerSignalEvent event) {
+    if (event is! PointerScrollEvent) return;
+    final keys = HardwareKeyboard.instance.logicalKeysPressed;
+    final controlPressed = keys.contains(LogicalKeyboardKey.controlLeft) ||
+        keys.contains(LogicalKeyboardKey.controlRight);
+    if (!controlPressed || event.scrollDelta.dy == 0) return;
+    _zoomBy(event.scrollDelta.dy < 0 ? 1.15 : 1 / 1.15);
   }
 
   double _pointerDistance() {
@@ -201,10 +233,8 @@ class _PdfDocumentViewState extends State<PdfDocumentView> {
     if (_pointers.length >= 2 || _pinchStartDistance == null) return;
     _pinchStartDistance = null;
     final next = (_scale * _gestureScale).clamp(_minScale, _maxScale);
-    setState(() {
-      _scale = next;
-      _gestureScale = 1;
-    });
+    _setScalePreservingPosition(next);
+    setState(() => _gestureScale = 1);
   }
 
   @override
@@ -235,29 +265,54 @@ class _PdfDocumentViewState extends State<PdfDocumentView> {
       return ErrorView(message: _error!, onRetry: _load);
     }
 
+    if ((Platform.isAndroid || Platform.isIOS) && _mobileController != null) {
+      final controller = _mobileController!;
+      return PdfViewPinch(
+        controller: controller,
+        minScale: 1,
+        maxScale: 8,
+        padding: _pageGap,
+        backgroundDecoration: const BoxDecoration(color: Color(0xffeeeeee)),
+        onPageChanged: (page) {
+          // 页码变化不重建外层页面，避免缩放手势中的布局跳动。
+          _currentPage = page;
+        },
+      );
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = ((constraints.maxWidth - 24) * _scale).clamp(
+        _devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
+        final viewportWidth = constraints.maxWidth - 24;
+        final width = (viewportWidth * _scale).clamp(
           240.0,
-          2400.0,
+          viewportWidth * _maxScale,
         );
         _renderWidth = width;
 
-        final pages = ListView.builder(
-          controller: _scroll,
-          physics: _gestureScale == 1
-              ? null
-              : const NeverScrollableScrollPhysics(),
-          itemExtent: _itemExtent,
-          cacheExtent: 600,
-          itemCount: _pageCount,
-          itemBuilder: (context, index) => _buildPage(index + 1),
+        final pages = SizedBox(
+          width: width,
+          child: ListView.builder(
+            controller: _scroll,
+            physics: _gestureScale == 1
+                ? null
+                : const NeverScrollableScrollPhysics(),
+            itemExtent: _itemExtent,
+            cacheExtent: 600,
+            itemCount: _pageCount,
+            itemBuilder: (context, index) => _buildPage(index + 1),
+          ),
+        );
+        final scrollablePages = SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: pages,
         );
 
         return Stack(
           children: [
             Positioned.fill(
               child: Listener(
+                onPointerSignal: _onPointerSignal,
                 onPointerDown: (event) {
                   _pointers[event.pointer] = event.localPosition;
                   if (_pointers.length == 2) {
@@ -268,8 +323,9 @@ class _PdfDocumentViewState extends State<PdfDocumentView> {
                   if (!_pointers.containsKey(event.pointer)) return;
                   _pointers[event.pointer] = event.localPosition;
                   final start = _pinchStartDistance;
-                  if (_pointers.length < 2 || start == null || start <= 0)
+                  if (_pointers.length < 2 || start == null || start <= 0) {
                     return;
+                  }
                   final next = (_pointerDistance() / start).clamp(0.5, 3.0);
                   if ((next - _gestureScale).abs() > 0.02) {
                     setState(() => _gestureScale = next);
@@ -278,8 +334,11 @@ class _PdfDocumentViewState extends State<PdfDocumentView> {
                 onPointerUp: (event) => _endPointer(event.pointer),
                 onPointerCancel: (event) => _endPointer(event.pointer),
                 child: _gestureScale == 1
-                    ? pages
-                    : Transform.scale(scale: _gestureScale, child: pages),
+                    ? scrollablePages
+                    : Transform.scale(
+                        scale: _gestureScale,
+                        child: scrollablePages,
+                      ),
               ),
             ),
             Positioned(left: 12, bottom: 12, child: _pageBadge()),
@@ -305,7 +364,7 @@ class _PdfDocumentViewState extends State<PdfDocumentView> {
               _renderPage(pageNumber, width),
               pageNumber,
               _documentId,
-              scale: _scale,
+              scale: _devicePixelRatio,
             ),
             fit: BoxFit.contain,
             gaplessPlayback: true,
