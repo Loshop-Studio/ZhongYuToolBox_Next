@@ -115,12 +115,3 @@ jobs:
           fi
           gh release upload "$tag" dist/* --clobber
 
-      - name: Sync release commit back to dev
-        run: |
-          set -euo pipefail
-          git fetch origin main dev
-          if git merge-base --is-ancestor origin/main origin/dev; then
-            echo "dev already contains main"
-            exit 0
-          fi
-          git push origin origin/main:refs/heads/dev
