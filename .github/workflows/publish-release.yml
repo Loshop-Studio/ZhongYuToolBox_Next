@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - .github/workflows/publish-release.yml
+      - windows/**
       - pubspec.yaml
       - lib/core/config/app_config.dart
       - assets/changelog.json
