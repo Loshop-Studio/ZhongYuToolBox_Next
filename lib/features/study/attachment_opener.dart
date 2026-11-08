@@ -87,6 +87,20 @@ void openAttachment(BuildContext context, String rawUrl, {String? forceKind}) {
     );
     return;
   }
+  if (declaredKind == 'audio' ||
+      path.endsWith('.mp3') ||
+      path.endsWith('.m4a') ||
+      path.endsWith('.wav') ||
+      path.endsWith('.aac') ||
+      path.endsWith('.ogg') ||
+      path.endsWith('.flac')) {
+    debugPrint('[openAttachment] -> 原生音频预览页');
+    context.push(
+      '/lesson/audio?url=${Uri.encodeQueryComponent(url)}'
+      '&name=${Uri.encodeQueryComponent(name)}',
+    );
+    return;
+  }
   debugPrint('[openAttachment] -> 系统外部应用');
   _launchExternal(context, url);
 }
@@ -106,6 +120,7 @@ void registerAttachmentHandlers(
     'open_html': 'html',
     'open_pdf': 'pdf',
     'open_video': 'video',
+    'open_audio': 'audio',
   };
   for (final entry in handlers.entries) {
     controller.addJavaScriptHandler(

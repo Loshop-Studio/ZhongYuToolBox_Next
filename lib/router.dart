@@ -24,6 +24,7 @@ import 'features/resources/resources_page.dart';
 import 'features/settings/settings_page.dart';
 import 'features/shell/app_shell.dart';
 import 'features/study/article_page.dart';
+import 'features/study/audio_player_page.dart';
 import 'features/study/column_pages_page.dart';
 import 'features/study/course_choosing_page.dart';
 import 'features/study/favorite_pages_page.dart';
@@ -245,6 +246,14 @@ final GoRouter appRouter = GoRouter(
       path: '/lesson/video',
       parentNavigatorKey: rootNavigatorKey,
       builder: (_, state) => VideoPlayerPage(
+        url: state.uri.queryParameters['url'] ?? '',
+        name: state.uri.queryParameters['name'] ?? '',
+      ),
+    ),
+    GoRoute(
+      path: '/lesson/audio',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (_, state) => AudioPlayerPage(
         url: state.uri.queryParameters['url'] ?? '',
         name: state.uri.queryParameters['name'] ?? '',
       ),

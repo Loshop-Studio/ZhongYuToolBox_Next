@@ -8,6 +8,7 @@ on:
     paths:
       - .github/workflows/publish-release.yml
       - windows/**
+      - installer/**
       - pubspec.yaml
       - lib/core/config/app_config.dart
       - assets/changelog.json
@@ -31,10 +32,17 @@ jobs:
         run: |
           $version = (Select-String -Path pubspec.yaml -Pattern '^version:\s*(\S+)' | ForEach-Object { $_.Matches[0].Groups[1].Value.Split('+')[0] })
           Compress-Archive -Path 'build/windows/x64/runner/Release/*' -DestinationPath "zhongyu-toolbox-windows-v$version.zip"
+          choco install innosetup --yes --no-progress
+          New-Item -ItemType Directory -Force -Path 'build/installer' | Out-Null
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$version" "installer\zytb.iss"
+          if ($LASTEXITCODE -ne 0) { throw "Inno Setup compiler failed with exit code $LASTEXITCODE" }
+          Copy-Item "build/installer/zhongyu-toolbox-windows-v$version-setup.exe" "zhongyu-toolbox-windows-v$version-setup.exe"
       - uses: actions/upload-artifact@v4
         with:
           name: windows-release
-          path: zhongyu-toolbox-windows-v*.zip
+          path: |
+            zhongyu-toolbox-windows-v*.zip
+            zhongyu-toolbox-windows-v*-setup.exe
           if-no-files-found: error
 
   android:
