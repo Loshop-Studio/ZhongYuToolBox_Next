@@ -1,0 +1,65 @@
+name: zhongyu_toolbox
+description: "中育工具箱（Flutter 版）：资源 / 测评 / 主页 / 学习 / 问答"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^2.6.1
+  go_router: ^14.6.2
+  dio: ^5.7.0
+  encrypt: ^5.0.3
+  pointycastle: ^3.9.1
+  path_provider: ^2.1.5
+  html: ^0.15.4
+  file_picker: ^8.1.7
+  archive: ^3.6.1
+  pdf: ^3.11.1
+  cached_network_image: ^3.4.1
+  intl: ^0.20.2
+  flutter_inappwebview: ^6.1.5
+  url_launcher: ^6.3.1
+  image: ^4.3.0
+  pdfx: ^2.11.0
+  media_kit: ^1.2.6
+  media_kit_video: ^2.0.1
+  media_kit_libs_windows_video: ^1.0.11
+  media_kit_libs_android_video: ^1.3.8
+  win32_registry: ^1.1.5
+  dynamic_color: ^1.1.2
+  flutter_colorpicker: ^1.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/icon/icon.png"
+  remove_alpha_ios: true
+  min_sdk_android: 21
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icon/icon.png
+    - assets/changelog.json
+    - assets/blackbroad.zip
+    - assets/note_template/page_router.bin
+    - assets/note_template/a888b5fb-e65d-4611-a3af-1f80a0fb6ced/059848e4-1971-47fb-9e47-517266cdef05_matrix.bin
+    - assets/note_template/a888b5fb-e65d-4611-a3af-1f80a0fb6ced/a2b4fb47-3623-45be-9fe9-57fc62e66651_file.bin
+    - assets/note_template/a888b5fb-e65d-4611-a3af-1f80a0fb6ced/e339e39b-64d9-4de0-bfaa-dace2a3f8e7d_command.bin
+    - assets/note_template/a888b5fb-e65d-4611-a3af-1f80a0fb6ced/header.bin
+    - assets/note_template/a888b5fb-e65d-4611-a3af-1f80a0fb6ced/router.bin
+    - assets/note_template/a888b5fb-e65d-4611-a3af-1f80a0fb6ced/screenshot.png
+    - assets/note_template/a888b5fb-e65d-4611-a3af-1f80a0fb6ced/snapshot.bin

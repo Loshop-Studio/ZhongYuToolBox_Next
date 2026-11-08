@@ -1,0 +1,90 @@
+name: Prepare release PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version name, for example 1.2.3 (build number increments automatically)
+        required: true
+        type: string
+      changelog:
+        description: Release notes (multiple lines are supported)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      - name: Validate inputs and update release metadata
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_NOTES: ${{ inputs.changelog }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+
+          const version = process.env.RELEASE_VERSION.trim();
+          const notes = process.env.RELEASE_NOTES.trim();
+          if (!/^\d+\.\d+\.\d+$/.test(version)) {
+            throw new Error('Version must use MAJOR.MINOR.PATCH, for example 1.2.3');
+          }
+          if (!notes) throw new Error('Release notes cannot be empty');
+
+          const pubspec = fs.readFileSync('pubspec.yaml', 'utf8');
+          const match = pubspec.match(/^version:\s*(\d+\.\d+\.\d+)\+(\d+)\s*$/m);
+          if (!match) throw new Error('Could not parse pubspec.yaml version: x.y.z+build');
+          const nextBuild = Number(match[2]) + 1;
+          if (!Number.isSafeInteger(nextBuild)) throw new Error('Build number is out of range');
+          fs.writeFileSync(
+            'pubspec.yaml',
+            pubspec.replace(/^version:.*$/m, `version: ${version}+${nextBuild}`),
+          );
+
+          const configPath = 'lib/core/config/app_config.dart';
+          const config = fs.readFileSync(configPath, 'utf8');
+          const updatedConfig = config.replace(
+            /static const String appVersion = '[^']+';/,
+            `static const String appVersion = '${version}';`,
+          );
+          if (updatedConfig === config) throw new Error('Could not find AppConfig.appVersion');
+          fs.writeFileSync(configPath, updatedConfig);
+
+          const changelogPath = 'assets/changelog.json';
+          const changelog = JSON.parse(fs.readFileSync(changelogPath, 'utf8'));
+          if (!Array.isArray(changelog.changelog)) throw new Error('Invalid changelog.json format');
+          changelog.changelog = [
+            { version, text: notes },
+            ...changelog.changelog.filter((entry) => entry.version !== version),
+          ];
+          fs.writeFileSync(changelogPath, `${JSON.stringify(changelog, null, 2)}\n`);
+          NODE
+
+      - name: Create release branch and PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          branch="release/v${RELEASE_VERSION}-${GITHUB_RUN_ID}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add pubspec.yaml lib/core/config/app_config.dart assets/changelog.json
+          git commit -m "chore(release): v${RELEASE_VERSION}"
+          git push origin "$branch"
+          gh pr create \
+            --base main \
+            --head "$branch" \
+            --title "Release v${RELEASE_VERSION}" \
+            --body "Release metadata prepared from dev. Review the version and changelog, then merge this PR to build and publish Windows, Android APK, and unsigned iOS IPA artifacts."
