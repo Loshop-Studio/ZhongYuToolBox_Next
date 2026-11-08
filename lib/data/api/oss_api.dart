@@ -99,7 +99,7 @@ class OssApi {
     String fc,
     String nonce,
   ) async {
-    final ts = DateTime.now().millisecondsSinceEpoch;
+    final ts = DateTime.now().toUtc().millisecondsSinceEpoch;
     final sign = _md5Upper('$userId+$fc+$_fr+$_ft+$_fe+$_fo+$nonce+$ts');
     final data = await ApiClient.instance.request(
       '/api/services/app/ObjectStorage/GenerateTokenV2Async',
