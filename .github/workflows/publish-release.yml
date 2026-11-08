@@ -116,24 +116,11 @@ jobs:
           gh release upload "$tag" dist/* --clobber
 
       - name: Sync release commit back to dev
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
-          ahead=$(gh api "repos/$REPOSITORY/compare/dev...main" --jq '.ahead_by')
-          if [[ "$ahead" == "0" ]]; then
+          git fetch origin main dev
+          if git merge-base --is-ancestor origin/main origin/dev; then
             echo "dev already contains main"
             exit 0
           fi
-
-          pr_number=$(gh pr list --base dev --head main --state open --json number --jq '.[0].number // empty')
-          if [[ -z "$pr_number" ]]; then
-            pr_url=$(gh pr create \
-              --base dev \
-              --head main \
-              --title "Sync release metadata from main" \
-              --body "Automatically sync the published version and changelog back to dev.")
-            pr_number=${pr_url##*/}
-          fi
-          gh pr merge "$pr_number" --merge
+          git push origin origin/main:refs/heads/dev
