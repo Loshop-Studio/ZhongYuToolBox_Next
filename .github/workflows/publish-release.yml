@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - .github/workflows/publish-release.yml
       - pubspec.yaml
       - lib/core/config/app_config.dart
       - assets/changelog.json
@@ -38,6 +39,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
