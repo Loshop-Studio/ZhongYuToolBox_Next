@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/config/app_config.dart';
@@ -18,6 +19,7 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
+  late final Player _backgroundPlayer;
   bool _checking = false;
   String _versionMessage = '';
   List<String> _changelog = const <String>[];
@@ -25,7 +27,25 @@ class _AboutPageState extends State<AboutPage> {
   @override
   void initState() {
     super.initState();
+    _backgroundPlayer = Player();
+    _backgroundPlayer.setPlaylistMode(PlaylistMode.loop);
+    _startBackgroundMusic();
     _loadChangelog();
+  }
+
+  Future<void> _startBackgroundMusic() async {
+    try {
+      final media = Media('asset:///assets/about_theme.aac');
+      await _backgroundPlayer.open(media);
+    } catch (_) {
+      // 资源未随旧构建产物更新时，不阻塞关于页打开。
+    }
+  }
+
+  @override
+  void dispose() {
+    _backgroundPlayer.dispose();
+    super.dispose();
   }
 
   Future<void> _loadChangelog() async {

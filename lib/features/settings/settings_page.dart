@@ -233,6 +233,14 @@ class _SettingsPageState extends State<SettingsPage> {
                 subtitle: const Text(AppConfig.appVersion),
               ),
               ListTile(
+                leading: const Icon(Icons.info_outline),
+                title: const Text('关于'),
+                subtitle: const Text('版本信息、更新日志与支持'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/about'),
+              ),
+              const Divider(),
+              ListTile(
                 leading: const Icon(Icons.groups_outlined),
                 title: const Text('问题反馈'),
                 subtitle: Text('QQ 群 ${AppConfig.supportQqGroup}'),
