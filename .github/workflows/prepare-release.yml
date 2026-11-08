@@ -73,8 +73,8 @@ jobs:
           const changelog = JSON.parse(fs.readFileSync(changelogPath, 'utf8'));
           if (!Array.isArray(changelog.changelog)) throw new Error('Invalid changelog.json format');
           changelog.changelog = [
-            { version, text: notes },
             ...changelog.changelog.filter((entry) => entry.version !== version),
+            { version, text: notes },
           ];
           fs.writeFileSync(changelogPath, `${JSON.stringify(changelog, null, 2)}\n`);
           NODE
