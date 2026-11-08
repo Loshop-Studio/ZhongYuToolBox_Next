@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "org.zykj.zhongyu_toolbox"
+    namespace = "cn.com.loshop.zhongyu_toolbox"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "org.zykj.zhongyu_toolbox"
+        applicationId = "cn.com.loshop.zhongyu_toolbox"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = maxOf(flutter.minSdkVersion, 23)

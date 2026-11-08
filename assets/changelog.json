@@ -1,8 +1,8 @@
 {
   "changelog": [
     {
-      "version": "1.0.1",
-      "text": "修复安卓无法编译问题"
+      "version": "1.0.3",
+      "text": "修复了编译流程"
     },
     {
       "version": "1.0.0",

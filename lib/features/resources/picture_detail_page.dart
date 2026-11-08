@@ -68,8 +68,11 @@ class _PictureDetailPageState extends State<PictureDetailPage> {
       );
       final data = response.data;
       if (data is! List<int> || data.isEmpty) throw ApiException('图片读取失败');
-      final name = _item.name.isNotEmpty ? _item.name : _fileName();
-      final path = await FileSaver.save(name, Uint8List.fromList(data));
+      final bytes = Uint8List.fromList(data);
+      final contentType = response.headers.value('content-type');
+      final base = _item.name.isNotEmpty ? _item.name : _fileName();
+      final name = _withExtension(base, contentType, _url, bytes);
+      final path = await FileSaver.save(name, bytes);
       if (!mounted) return;
       showToast(context, path == null ? '已取消保存' : '已保存：$path');
     } catch (e) {
@@ -107,6 +110,79 @@ class _PictureDetailPageState extends State<PictureDetailPage> {
   String _fileName() {
     final segments = Uri.tryParse(_url)?.pathSegments ?? const <String>[];
     return segments.isEmpty ? 'image.png' : segments.last;
+  }
+
+  /// 缺扩展名时按 MIME、文件头或 URL 推导，避免保存出无后缀文件。
+  String _withExtension(
+    String base,
+    String? mime,
+    String url,
+    Uint8List bytes,
+  ) {
+    if (RegExp(r'\.[a-z0-9]+$', caseSensitive: false).hasMatch(base)) {
+      return base;
+    }
+    final ext =
+        _extFromMime(mime) ?? _extFromBytes(bytes) ?? _extFromUrl(url) ?? 'png';
+    return '$base.$ext';
+  }
+
+  String? _extFromMime(String? mime) {
+    const map = <String, String>{
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/gif': 'gif',
+      'image/webp': 'webp',
+      'image/bmp': 'bmp',
+      'image/svg+xml': 'svg',
+    };
+    if (mime == null) return null;
+    return map[mime.split(';').first.trim().toLowerCase()];
+  }
+
+  String? _extFromBytes(Uint8List bytes) {
+    if (bytes.length >= 4 &&
+        bytes[0] == 0x89 &&
+        bytes[1] == 0x50 &&
+        bytes[2] == 0x4e &&
+        bytes[3] == 0x47) {
+      return 'png';
+    }
+    if (bytes.length >= 3 &&
+        bytes[0] == 0xff &&
+        bytes[1] == 0xd8 &&
+        bytes[2] == 0xff) {
+      return 'jpg';
+    }
+    if (bytes.length >= 3 &&
+        bytes[0] == 0x47 &&
+        bytes[1] == 0x49 &&
+        bytes[2] == 0x46) {
+      return 'gif';
+    }
+    if (bytes.length >= 12 &&
+        bytes[0] == 0x52 &&
+        bytes[1] == 0x49 &&
+        bytes[2] == 0x46 &&
+        bytes[3] == 0x46 &&
+        bytes[8] == 0x57 &&
+        bytes[9] == 0x45 &&
+        bytes[10] == 0x42 &&
+        bytes[11] == 0x50) {
+      return 'webp';
+    }
+    if (bytes.length >= 2 && bytes[0] == 0x42 && bytes[1] == 0x4d) {
+      return 'bmp';
+    }
+    return null;
+  }
+
+  String? _extFromUrl(String url) {
+    final segments = Uri.tryParse(url)?.pathSegments ?? const <String>[];
+    if (segments.isEmpty) return null;
+    final match = RegExp(r'\.([a-z0-9]+)$', caseSensitive: false)
+        .firstMatch(segments.last);
+    return match?.group(1)?.toLowerCase();
   }
 
   @override
