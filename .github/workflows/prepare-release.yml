@@ -53,11 +53,14 @@ jobs:
 
           const configPath = 'lib/core/config/app_config.dart';
           const config = fs.readFileSync(configPath, 'utf8');
+          const appVersionPattern = /static const String appVersion = '[^']+';/;
+          if (!appVersionPattern.test(config)) {
+            throw new Error('Could not find AppConfig.appVersion');
+          }
           const updatedConfig = config.replace(
-            /static const String appVersion = '[^']+';/,
+            appVersionPattern,
             `static const String appVersion = '${version}';`,
           );
-          if (updatedConfig === config) throw new Error('Could not find AppConfig.appVersion');
           fs.writeFileSync(configPath, updatedConfig);
 
           const changelogPath = 'assets/changelog.json';
