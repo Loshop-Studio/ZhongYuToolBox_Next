@@ -55,10 +55,16 @@ class _ArticlePageState extends State<ArticlePage> {
             icon: const Icon(Icons.open_in_browser),
             onPressed: () async {
               final uri = Uri.tryParse(_entryUrl);
-              if (uri != null && await canLaunchUrl(uri)) {
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
-              } else if (mounted) {
-                showToast(context, '无法打开链接');
+              if (uri == null) {
+                if (mounted) showToast(context, '链接地址无效');
+                return;
+              }
+              final opened = await launchUrl(
+                uri,
+                mode: LaunchMode.externalApplication,
+              );
+              if (!opened && mounted) {
+                showToast(context, '无法打开链接，请检查默认浏览器设置');
               }
             },
           ),

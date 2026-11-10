@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/config/app_config.dart';
 import '../../core/storage/session_manager.dart';
@@ -44,12 +45,17 @@ class _LessonWebPageState extends State<LessonWebPage> {
     final apiHost = session.apiBaseUrl.isNotEmpty
         ? session.apiBaseUrl
         : AppConfig.defaultApiBaseUrl;
-    // token / apiHost 按官方格式直接拼，不做额外编码（JWT 只含安全字符）
-    final query = 'token=${session.token}&url=$apiHost';
-    final hash = widget.courseId > 0 && widget.catalogId.isNotEmpty
-        ? '#/?entry=study&catalogId=${widget.catalogId}&courseId=${widget.courseId}'
-        : '#/';
-    return '${AppConfig.lessonPadBase}?$query$hash';
+    final base = Uri.parse(AppConfig.lessonPadBase);
+    final entry = base.replace(
+      queryParameters: {
+        'token': session.token,
+        'url': apiHost,
+      },
+      fragment: widget.courseId > 0 && widget.catalogId.isNotEmpty
+          ? '/?entry=study&catalogId=${Uri.encodeComponent(widget.catalogId)}&courseId=${widget.courseId}'
+          : '/',
+    );
+    return entry.toString();
   }
 
   @override
@@ -71,6 +77,20 @@ class _LessonWebPageState extends State<LessonWebPage> {
             tooltip: '刷新',
             onPressed: () => _controller?.reload(),
             icon: const Icon(Icons.refresh),
+          ),
+          IconButton(
+            tooltip: '浏览器打开',
+            onPressed: () async {
+              final uri = Uri.parse(_entryUrl);
+              final opened = await launchUrl(
+                uri,
+                mode: LaunchMode.externalApplication,
+              );
+              if (!opened && mounted) {
+                showToast(context, '无法打开链接，请检查默认浏览器设置');
+              }
+            },
+            icon: const Icon(Icons.open_in_browser),
           ),
           const SizedBox(width: 4),
         ],
