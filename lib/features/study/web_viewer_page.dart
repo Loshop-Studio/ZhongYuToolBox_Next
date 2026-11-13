@@ -7,6 +7,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../../core/network/api_exception.dart';
 import '../../core/util/urls.dart';
+import '../../core/web/app_webview_environment.dart';
 import '../../core/web/js_bridge.dart';
 import '../../shared/widgets/common.dart';
 import 'attachment_opener.dart';
@@ -109,6 +110,7 @@ class _WebViewerPageState extends State<WebViewerPage> {
 
   @override
   Widget build(BuildContext context) {
+    final webViewError = AppWebViewEnvironment.initializationError;
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(onPressed: () => Navigator.of(context).maybePop()),
@@ -130,7 +132,9 @@ class _WebViewerPageState extends State<WebViewerPage> {
           const SizedBox(width: 4),
         ],
       ),
-      body: _error != null
+      body: webViewError != null
+          ? ErrorView(message: webViewError)
+          : _error != null
           ? ErrorView(message: _error!, onRetry: _retry)
           : (_mode == _LoadMode.probing
                 ? const LoadingView(text: '正在加载页面…')
@@ -144,6 +148,7 @@ class _WebViewerPageState extends State<WebViewerPage> {
 
     return InAppWebView(
       key: ValueKey<int>(_reloadKey),
+      webViewEnvironment: AppWebViewEnvironment.instance,
       initialUrlRequest: isData ? null : URLRequest(url: WebUri(_displayUrl)),
       initialData: isData
           ? InAppWebViewInitialData(

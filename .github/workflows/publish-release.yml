@@ -7,6 +7,8 @@ on:
       - main
     paths:
       - .github/workflows/publish-release.yml
+      - ios/**
+      - macos/**
       - windows/**
       - installer/**
       - pubspec.yaml
@@ -120,6 +122,21 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: flutter build ios --release --no-codesign
+      - name: Verify iOS application bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          app=build/ios/iphoneos/Runner.app
+          required_files=(
+            "$app/Runner"
+            "$app/Frameworks/App.framework/App"
+            "$app/Frameworks/Flutter.framework/Flutter"
+            "$app/Frameworks/Mpv.framework/Mpv"
+            "$app/Frameworks/App.framework/flutter_assets/AssetManifest.bin"
+          )
+          for file in "${required_files[@]}"; do
+            test -s "$file" || { echo "Missing or empty iOS runtime file: $file" >&2; exit 1; }
+          done
       - name: Package unsigned IPA
         shell: bash
         run: |
@@ -135,12 +152,44 @@ jobs:
           path: zhongyu-toolbox-ios-v*-unsigned.ipa
           if-no-files-found: error
 
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build macos --release
+      - name: Package macOS app
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(sed -n 's/^version: *\([0-9.]*\)+.*/\1/p' pubspec.yaml)
+          test -n "$version"
+          app_path=''
+          for candidate in build/macos/Build/Products/Release/*.app; do
+            if [[ -d "$candidate" ]]; then
+              app_path="$candidate"
+              break
+            fi
+          done
+          test -n "$app_path"
+          ditto -c -k --sequesterRsrc --keepParent "$app_path" "zhongyu-toolbox-macos-v${version}.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-release
+          path: zhongyu-toolbox-macos-v*.zip
+          if-no-files-found: error
+
   release:
     runs-on: ubuntu-latest
     needs:
       - windows
       - android
       - ios-unsigned
+      - macos
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4

@@ -24,6 +24,7 @@ import 'features/resources/resources_page.dart';
 import 'features/settings/settings_page.dart';
 import 'features/shell/app_shell.dart';
 import 'features/study/article_page.dart';
+import 'features/study/article_comments_page.dart';
 import 'features/study/audio_player_page.dart';
 import 'features/study/column_pages_page.dart';
 import 'features/study/course_choosing_page.dart';
@@ -180,6 +181,13 @@ final GoRouter appRouter = GoRouter(
       builder: (_, state) => ColumnPagesPage(
         colId: _intParam(state.pathParameters['colId']),
         name: state.uri.queryParameters['name'] ?? '',
+      ),
+    ),
+    GoRoute(
+      path: '/article/:pageId/comments',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (_, state) => ArticleCommentsPage(
+        pageId: _intParam(state.pathParameters['pageId']),
       ),
     ),
     GoRoute(

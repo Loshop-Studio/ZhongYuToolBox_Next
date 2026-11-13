@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:flutter/gestures.dart';
@@ -10,6 +11,7 @@ import '../../core/network/api_exception.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../core/storage/session_manager.dart';
 import '../../core/util/file_saver.dart';
+import '../../core/web/app_webview_environment.dart';
 import '../../data/api/exam_api.dart';
 import '../../data/api/exam_mistake_api.dart';
 import '../../data/models/exam.dart';
@@ -119,14 +121,21 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
       final overview = await overviewFuture;
       final analysis = await analysisFuture;
 
-      ExamReview? review;
-      if (analysis != null) {
-        review = await _saveReview(task, analysis);
-      } else {
-        review = await ExamReviewStore.instance.getReview(
-          _accountKey,
-          widget.taskId,
-        );
+      ExamReview? review = await ExamReviewStore.instance.getReview(
+        _accountKey,
+        widget.taskId,
+      );
+      if (ExamReviewStore.canAnalyzeWrongQuestions(analysis)) {
+        try {
+          review = await _saveReview(task, analysis!, examId);
+        } catch (e, stackTrace) {
+          // 错题识别是附加能力，失败不能阻止用户进入测评。
+          log(
+            '[测评详情] 自动识别错题失败 taskId=${widget.taskId}: $e',
+            name: 'Assessment',
+            stackTrace: stackTrace,
+          );
+        }
       }
 
       if (!mounted) return;
@@ -154,6 +163,7 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
   Future<ExamReview> _saveReview(
     Map<String, dynamic> task,
     Map<String, dynamic> analysis,
+    int examId,
   ) async {
     final detected = ExamReviewStore.analysisWrongQuestions(
       task,
@@ -162,7 +172,7 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
     );
     final review = ExamReview(
       taskId: widget.taskId,
-      examId: _examId,
+      examId: examId,
       name: (task['examName'] ?? '测评').toString(),
       questionIds: detected.questions
           .map((q) => (q['id'] as num?)?.toInt() ?? 0)
@@ -183,7 +193,7 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
     try {
       final task = await ExamApi.getTask(widget.taskId);
       final analysis = await ExamApi.getQuestionAnalysis(_examId);
-      final review = await _saveReview(task, analysis);
+      final review = await _saveReview(task, analysis, _examId);
       if (!mounted) return;
       setState(() => _review = review);
       showToast(context, '已重新识别本人错题');
@@ -509,7 +519,7 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             itemCount: _questions.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               final question = _questions[index];
               final selected = question.id == _selectedQuestion;
@@ -656,6 +666,10 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
     if (id <= 0) {
       return const EmptyView(icon: Icons.help_outline, text: '请选择题目');
     }
+    final webViewError = AppWebViewEnvironment.initializationError;
+    if (webViewError != null) {
+      return ErrorView(message: webViewError);
+    }
     final token = _session.session.token;
     final url = ApiClient.instance.resolveUrl(
       '/Question/View/$id?showAnalysis=true',
@@ -666,6 +680,7 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
         Positioned.fill(
           child: InAppWebView(
             key: ValueKey<String>('$id-$_questionReload'),
+            webViewEnvironment: AppWebViewEnvironment.instance,
             initialUrlRequest: URLRequest(
               url: WebUri(url),
               headers: token.isEmpty

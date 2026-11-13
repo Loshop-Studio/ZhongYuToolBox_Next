@@ -167,9 +167,11 @@ class _ColumnPagesPageState extends State<ColumnPagesPage> {
       child: ListView.separated(
         controller: _controller,
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
+        padding: const EdgeInsets.only(bottom: 32),
         itemCount: _pages.length + (_loadingMore ? 1 : 0),
-        separatorBuilder: (_, __) => const SizedBox(height: 8),
+        separatorBuilder: (_, index) => index < _pages.length - 1
+            ? const Divider(height: 1, indent: 16, endIndent: 16)
+            : const SizedBox.shrink(),
         itemBuilder: (context, index) {
           if (index >= _pages.length) {
             return const Padding(
@@ -184,79 +186,92 @@ class _ColumnPagesPageState extends State<ColumnPagesPage> {
             );
           }
           final page = _pages[index];
-          return SectionCard(
-            padding: const EdgeInsets.all(14),
+          return InkWell(
             onTap: () => context.push('/article/${page.id}'),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    if (page.isTop) ...[
-                      const Chip(label: Text('置顶')),
-                      const SizedBox(width: 6),
-                    ],
-                    if (!page.isRead)
-                      Icon(
-                        Icons.circle,
-                        size: 8,
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    Expanded(
-                      child: Text(
-                        page.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimary,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      if (page.isTop) ...[
+                        Text(
+                          '置顶',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      if (!page.isRead) ...[
+                        Icon(
+                          Icons.circle,
+                          size: 8,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      Expanded(
+                        child: Text(
+                          page.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Text(
-                      formatDateTime(page.publishTime, pattern: 'yyyy-MM-dd'),
-                      style: const TextStyle(
-                        fontSize: 11.5,
+                      const SizedBox(width: 8),
+                      const Icon(Icons.chevron_right, size: 18),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Text(
+                        formatDateTime(page.publishTime, pattern: 'yyyy-MM-dd'),
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const Spacer(),
+                      const Icon(
+                        Icons.remove_red_eye_outlined,
+                        size: 13,
                         color: AppColors.textSecondary,
                       ),
-                    ),
-                    const Spacer(),
-                    const Icon(
-                      Icons.remove_red_eye_outlined,
-                      size: 13,
-                      color: AppColors.textSecondary,
-                    ),
-                    const SizedBox(width: 3),
-                    Text(
-                      '${page.hits}',
-                      style: const TextStyle(
-                        fontSize: 11,
+                      const SizedBox(width: 3),
+                      Text(
+                        '${page.hits}',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Icon(
+                        Icons.star_border,
+                        size: 13,
                         color: AppColors.textSecondary,
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    const Icon(
-                      Icons.star_border,
-                      size: 13,
-                      color: AppColors.textSecondary,
-                    ),
-                    const SizedBox(width: 3),
-                    Text(
-                      '${page.stars}',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textSecondary,
+                      const SizedBox(width: 3),
+                      Text(
+                        '${page.stars}',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           );
         },

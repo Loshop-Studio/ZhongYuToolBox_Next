@@ -150,6 +150,167 @@ const String columnHideBackArrowScript = r'''
 })();
 ''';
 
+/// 删除移动端在线专栏页面底部的“最近更新”时间。
+/// MutationObserver 兜住 SPA 异步渲染和文章切换后重新插入的节点。
+const String columnRemoveMobileUpdateTimeScript = r'''
+(function () {
+  function removeUpdateTime() {
+    var els = document.querySelectorAll('.bottom-time-span');
+    for (var i = 0; i < els.length; i++) {
+      if (els[i].parentNode) {
+        els[i].parentNode.removeChild(els[i]);
+      }
+    }
+  }
+  removeUpdateTime();
+  if (!window.__zyRemoveMobileUpdateTime) {
+    var timer = null;
+    window.__zyRemoveMobileUpdateTime = new MutationObserver(function () {
+      if (timer) return;
+      timer = setTimeout(function () {
+        timer = null;
+        removeUpdateTime();
+      }, 60);
+    });
+    window.__zyRemoveMobileUpdateTime.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
+  }
+})();
+''';
+
+/// 接管在线专栏网页里的评论入口。
+///
+/// 在 document start 阶段先注册捕获监听，抢在网页框架的事件委托之前阻断点击；
+/// 同时 clone 节点以移除节点及其子元素上的监听器，再清除内联 on* 属性。
+/// MutationObserver 负责处理 SPA 异步渲染和文章切换后的新节点。
+const String columnCommentTakeoverScript = r'''
+(function () {
+  function isCommentEntry(element) {
+    if (!element || !element.querySelector) return false;
+    var uses = element.querySelectorAll('use');
+    for (var i = 0; i < uses.length; i++) {
+      var href = uses[i].getAttribute('href') ||
+        uses[i].getAttribute('xlink:href') || '';
+      if (href === '#icon-pinglun') return true;
+    }
+    return false;
+  }
+
+  function commentEntryOf(target) {
+    var node = target;
+    if (node && node.nodeType === 3) node = node.parentElement;
+    while (node && node !== document) {
+      if (node.classList &&
+          node.classList.contains('common-content') &&
+          isCommentEntry(node)) {
+        return node;
+      }
+      node = node.parentElement;
+    }
+    return null;
+  }
+
+  function stripInlineHandlers(root) {
+    var nodes = [root];
+    var descendants = root.querySelectorAll('*');
+    for (var i = 0; i < descendants.length; i++) {
+      nodes.push(descendants[i]);
+    }
+    for (var j = 0; j < nodes.length; j++) {
+      var attributes = nodes[j].attributes;
+      for (var k = attributes.length - 1; k >= 0; k--) {
+        if (/^on/i.test(attributes[k].name)) {
+          nodes[j].removeAttribute(attributes[k].name);
+        }
+      }
+    }
+  }
+
+  function stopEvent(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+  }
+
+  function openComments(event) {
+    if (!commentEntryOf(event.target)) return;
+    stopEvent(event);
+    try {
+      if (window.flutter_inappwebview &&
+          window.flutter_inappwebview.callHandler) {
+        window.flutter_inappwebview.callHandler('open_article_comments');
+      }
+    } catch (e) {}
+  }
+
+  function stopCommentPointerEvent(event) {
+    if (!commentEntryOf(event.target)) return;
+    event.stopPropagation();
+    if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+  }
+
+  if (!window.__zyCommentCaptureInstalled) {
+    window.__zyCommentCaptureInstalled = true;
+    document.addEventListener('click', openComments, true);
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter' || event.key === ' ') openComments(event);
+    }, true);
+    document.addEventListener('pointerdown', stopCommentPointerEvent, true);
+    document.addEventListener('pointerup', stopCommentPointerEvent, true);
+    document.addEventListener('touchstart', stopCommentPointerEvent, true);
+    document.addEventListener('touchend', stopCommentPointerEvent, true);
+  }
+
+  function takeOver() {
+    var entries = document.querySelectorAll('.common-content');
+    for (var i = 0; i < entries.length; i++) {
+      var entry = entries[i];
+      if (!isCommentEntry(entry) ||
+          entry.getAttribute('data-zy-comment-entry') === '1' ||
+          !entry.parentNode) {
+        continue;
+      }
+
+      var replacement = entry.cloneNode(true);
+      replacement.setAttribute('data-zy-comment-entry', '1');
+      replacement.setAttribute('role', 'button');
+      replacement.setAttribute('tabindex', '0');
+      replacement.style.cursor = 'pointer';
+      stripInlineHandlers(replacement);
+      entry.parentNode.replaceChild(replacement, entry);
+    }
+  }
+
+  function startTakeover() {
+    if (!document.documentElement) {
+      document.addEventListener('DOMContentLoaded', startTakeover, {
+        once: true
+      });
+      return;
+    }
+    takeOver();
+    if (window.__zyCommentTakeover) return;
+
+    var timer = null;
+    window.__zyCommentTakeover = new MutationObserver(function () {
+      if (timer) return;
+      timer = setTimeout(function () {
+        timer = null;
+        takeOver();
+      }, 60);
+    });
+    window.__zyCommentTakeover.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  startTakeover();
+})();
+''';
+
 /// `window.flutter_inappwebview._callHandler(name, funcName, JSON.stringify(args))`
 ///
 /// flutter_inappwebview 6.x 只提供 `callHandler(name, ...args)`，

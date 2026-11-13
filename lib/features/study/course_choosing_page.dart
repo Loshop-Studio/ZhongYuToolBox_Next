@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../../core/config/app_config.dart';
 import '../../core/storage/session_manager.dart';
+import '../../core/web/app_webview_environment.dart';
 import '../../core/web/js_bridge.dart';
 import '../../shared/widgets/common.dart';
 import 'attachment_opener.dart';
@@ -46,6 +47,7 @@ class _CourseChoosingPageState extends State<CourseChoosingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final webViewError = AppWebViewEnvironment.initializationError;
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(onPressed: () => Navigator.of(context).maybePop()),
@@ -64,38 +66,41 @@ class _CourseChoosingPageState extends State<CourseChoosingPage> {
           const SizedBox(width: 4),
         ],
       ),
-      body: Stack(
-        children: [
-          Positioned.fill(child: _buildWebView()),
-          if (_loading)
-            const Positioned.fill(
-              child: ColoredBox(
-                color: Colors.white,
-                child: LoadingView(text: '正在加载选课页面…'),
-              ),
+      body: webViewError != null
+          ? ErrorView(message: webViewError)
+          : Stack(
+              children: [
+                Positioned.fill(child: _buildWebView()),
+                if (_loading)
+                  const Positioned.fill(
+                    child: ColoredBox(
+                      color: Colors.white,
+                      child: LoadingView(text: '正在加载选课页面…'),
+                    ),
+                  ),
+                if (_error != null)
+                  Positioned.fill(
+                    child: ColoredBox(
+                      color: Colors.white,
+                      child: ErrorView(
+                        message: _error!,
+                        onRetry: () => setState(() {
+                          _error = null;
+                          _loading = true;
+                          _reloadKey++;
+                        }),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-          if (_error != null)
-            Positioned.fill(
-              child: ColoredBox(
-                color: Colors.white,
-                child: ErrorView(
-                  message: _error!,
-                  onRetry: () => setState(() {
-                    _error = null;
-                    _loading = true;
-                    _reloadKey++;
-                  }),
-                ),
-              ),
-            ),
-        ],
-      ),
     );
   }
 
   Widget _buildWebView() {
     return InAppWebView(
       key: ValueKey<int>(_reloadKey),
+      webViewEnvironment: AppWebViewEnvironment.instance,
       initialUrlRequest: URLRequest(url: WebUri(_entryUrl)),
       initialSettings: InAppWebViewSettings(
         javaScriptEnabled: true,

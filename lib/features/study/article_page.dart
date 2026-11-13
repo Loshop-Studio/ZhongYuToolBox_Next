@@ -1,11 +1,14 @@
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/config/app_config.dart';
 import '../../core/storage/session_manager.dart';
+import '../../core/web/app_webview_environment.dart';
 import '../../core/web/js_bridge.dart';
 import '../../shared/widgets/common.dart';
 import 'attachment_opener.dart';
@@ -25,8 +28,13 @@ class _ArticlePageState extends State<ArticlePage> {
   final SessionManager _session = SessionManager.instance;
 
   bool _loading = true;
+  bool _openingComments = false;
   String? _error;
   int _reloadKey = 0;
+
+  bool get _isMobile =>
+      defaultTargetPlatform == TargetPlatform.android ||
+      defaultTargetPlatform == TargetPlatform.iOS;
 
   String get _entryUrl {
     final session = _session.session;
@@ -45,6 +53,7 @@ class _ArticlePageState extends State<ArticlePage> {
 
   @override
   Widget build(BuildContext context) {
+    final webViewError = AppWebViewEnvironment.initializationError;
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(onPressed: () => Navigator.of(context).maybePop()),
@@ -71,38 +80,41 @@ class _ArticlePageState extends State<ArticlePage> {
           const SizedBox(width: 4),
         ],
       ),
-      body: Stack(
-        children: [
-          Positioned.fill(child: _buildWebView()),
-          if (_loading)
-            const Positioned.fill(
-              child: ColoredBox(
-                color: Colors.white,
-                child: LoadingView(text: '正在加载文章…'),
-              ),
+      body: webViewError != null
+          ? ErrorView(message: webViewError)
+          : Stack(
+              children: [
+                Positioned.fill(child: _buildWebView()),
+                if (_loading)
+                  const Positioned.fill(
+                    child: ColoredBox(
+                      color: Colors.white,
+                      child: LoadingView(text: '正在加载文章…'),
+                    ),
+                  ),
+                if (_error != null)
+                  Positioned.fill(
+                    child: ColoredBox(
+                      color: Colors.white,
+                      child: ErrorView(
+                        message: _error!,
+                        onRetry: () => setState(() {
+                          _error = null;
+                          _loading = true;
+                          _reloadKey++;
+                        }),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-          if (_error != null)
-            Positioned.fill(
-              child: ColoredBox(
-                color: Colors.white,
-                child: ErrorView(
-                  message: _error!,
-                  onRetry: () => setState(() {
-                    _error = null;
-                    _loading = true;
-                    _reloadKey++;
-                  }),
-                ),
-              ),
-            ),
-        ],
-      ),
     );
   }
 
   Widget _buildWebView() {
     return InAppWebView(
       key: ValueKey<int>(_reloadKey),
+      webViewEnvironment: AppWebViewEnvironment.instance,
       initialUrlRequest: URLRequest(url: WebUri(_entryUrl)),
       initialSettings: InAppWebViewSettings(
         javaScriptEnabled: true,
@@ -127,9 +139,31 @@ class _ArticlePageState extends State<ArticlePage> {
           source: columnHideBackArrowScript,
           injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
         ),
+        UserScript(
+          source: columnCommentTakeoverScript,
+          injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+        ),
+        if (_isMobile)
+          UserScript(
+            source: columnRemoveMobileUpdateTimeScript,
+            injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
+          ),
       ]),
       onWebViewCreated: (controller) {
         registerAttachmentHandlers(controller, context, 'ArticlePage');
+        controller.addJavaScriptHandler(
+          handlerName: 'open_article_comments',
+          callback: (_) async {
+            if (_openingComments || !mounted) return null;
+            _openingComments = true;
+            try {
+              await context.push('/article/${widget.pageId}/comments');
+            } finally {
+              _openingComments = false;
+            }
+            return null;
+          },
+        );
       },
       onConsoleMessage: (controller, message) {
         if (!message.message.contains('JsToJava')) return;
@@ -140,6 +174,15 @@ class _ArticlePageState extends State<ArticlePage> {
         await controller.evaluateJavascript(source: columnVideoReplaceScript);
         // 兜底隐藏官方返回箭头（SPA 可能晚于首次渲染才插入）
         await controller.evaluateJavascript(source: columnHideBackArrowScript);
+        // 接管网页评论入口，统一进入 Flutter 评论页
+        await controller.evaluateJavascript(
+          source: columnCommentTakeoverScript,
+        );
+        if (_isMobile) {
+          await controller.evaluateJavascript(
+            source: columnRemoveMobileUpdateTimeScript,
+          );
+        }
         if (!mounted) return;
         setState(() {
           _loading = false;

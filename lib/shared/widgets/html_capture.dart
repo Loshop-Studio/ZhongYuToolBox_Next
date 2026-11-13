@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
+import '../../core/web/app_webview_environment.dart';
+
 /// 离屏渲染 HTML 并截图（用于错题缩略图 stemShoot，替代旧版 html2canvas）
 class HtmlCapture extends StatefulWidget {
   const HtmlCapture({
@@ -23,6 +25,17 @@ class HtmlCapture extends StatefulWidget {
 class _HtmlCaptureState extends State<HtmlCapture> {
   InAppWebViewController? _controller;
   bool _done = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (AppWebViewEnvironment.initializationError != null) {
+      _done = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) widget.onCaptured(null);
+      });
+    }
+  }
 
   static const String _style = '''
   html, body { margin: 0; padding: 12px; background: #ffffff; }
@@ -56,11 +69,15 @@ class _HtmlCaptureState extends State<HtmlCapture> {
 
   @override
   Widget build(BuildContext context) {
+    if (AppWebViewEnvironment.initializationError != null) {
+      return const SizedBox.shrink();
+    }
     return Offstage(
       child: SizedBox(
         width: widget.width,
         height: 1,
         child: InAppWebView(
+          webViewEnvironment: AppWebViewEnvironment.instance,
           initialData: InAppWebViewInitialData(
             data: _wrap(widget.html),
             mimeType: 'text/html',

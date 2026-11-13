@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../core/network/api_client.dart';
+import '../../core/network/api_exception.dart';
 import '../models/column.dart';
 
 /// 在线专栏接口（复刻 src/api/column.ts）
@@ -10,6 +11,26 @@ class ColumnApi {
   static dynamic _unwrap(dynamic data) {
     if (data is Map && data.containsKey('result')) return data['result'];
     return data;
+  }
+
+  static const Map<String, String> _webClientHeaders = <String, String>{
+    'AppName': 'WebClient',
+    'AppVersion': '0',
+    'ClientCode': 'null',
+  };
+
+  static void _ensureSuccess(dynamic data) {
+    if (data is! Map || data['success'] != false) return;
+    final error = data['error'];
+    final message = error is Map ? error['message'] : null;
+    throw ApiException(message?.toString() ?? '操作失败，请稍后重试');
+  }
+
+  static String _validateMessage(String message) {
+    final value = message.trim();
+    if (value.isEmpty) throw ApiException('内容不能为空');
+    if (value.runes.length > 100) throw ApiException('内容不能超过 100 字');
+    return value;
   }
 
   /// 学科 + 专栏树
@@ -75,6 +96,69 @@ class ColumnApi {
       method: 'POST',
       query: {'pageId': pageId},
     );
+  }
+
+  /// 专栏文章评论，公开评论与我的评论共用同一个分页接口。
+  static Future<({List<ColumnComment> items, int total})> getPageComments(
+    int pageId, {
+    required bool publicOnly,
+    required bool myOnly,
+    int skipCount = 0,
+    int maxResultCount = 20,
+  }) async {
+    final data = await ApiClient.instance.request(
+      '/api/services/app/appWebSite/GetPagedCommentsAndRepliesAsync',
+      method: 'POST',
+      headers: _webClientHeaders,
+      data: jsonEncode({
+        'pageId': pageId,
+        'publicOnly': publicOnly,
+        'skipCount': skipCount,
+        'maxResultCount': maxResultCount,
+        'myOnly': myOnly,
+      }),
+    );
+    _ensureSuccess(data);
+    final result = _unwrap(data);
+    if (result is! Map) return (items: <ColumnComment>[], total: 0);
+    final items = result['items'];
+    return (
+      items: items is List
+          ? items
+                .whereType<Map>()
+                .map(
+                  (e) => ColumnComment.fromJson(Map<String, dynamic>.from(e)),
+                )
+                .toList()
+          : <ColumnComment>[],
+      total: (result['totalCount'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  static Future<void> createPageComment(int pageId, String content) async {
+    final data = await ApiClient.instance.request(
+      '/api/services/app/appWebSite/CreateCommentAsync',
+      method: 'POST',
+      headers: _webClientHeaders,
+      data: jsonEncode({
+        'specialPageId': pageId,
+        'content': _validateMessage(content),
+      }),
+    );
+    _ensureSuccess(data);
+  }
+
+  static Future<void> replyPageComment(int commentId, String reply) async {
+    final data = await ApiClient.instance.request(
+      '/api/services/app/appWebSite/ReplyCommentAsync',
+      method: 'POST',
+      headers: _webClientHeaders,
+      data: jsonEncode({
+        'commentId': commentId,
+        'reply': _validateMessage(reply),
+      }),
+    );
+    _ensureSuccess(data);
   }
 
   /// 我的收藏夹

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
+import '../../core/web/app_webview_environment.dart';
+
 /// 图片统一尺寸（内容区 1/5）
 const String _imgInlineStyle = 'max-width:20% !important;height:auto !important';
 
@@ -185,9 +187,19 @@ class _ContentHtmlViewState extends State<ContentHtmlView> {
         child: Text('暂无内容', style: Theme.of(context).textTheme.bodyMedium),
       );
     }
+    final webViewError = AppWebViewEnvironment.initializationError;
+    if (webViewError != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(webViewError, textAlign: TextAlign.center),
+        ),
+      );
+    }
 
     final webView = InAppWebView(
       key: ValueKey<int>(_version),
+      webViewEnvironment: AppWebViewEnvironment.instance,
       initialData: InAppWebViewInitialData(
         data: _wrapped,
         baseUrl: WebUri(widget.baseUrl),
