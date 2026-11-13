@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/network/api_exception.dart';
 import '../../core/responsive/breakpoints.dart';
+import '../../core/storage/image_cache_manager.dart';
 import '../../core/util/formatters.dart';
 import '../../core/util/urls.dart';
 import '../../data/api/oss_api.dart';
@@ -325,6 +326,7 @@ class _GalleryTile extends StatelessWidget {
             ),
             child: CachedNetworkImage(
               imageUrl: galleryImageUrl(item.picture),
+              cacheManager: ZyImageCacheManager.instance,
               fit: BoxFit.cover,
               placeholder: (_, __) =>
                   const Center(child: CircularProgressIndicator()),

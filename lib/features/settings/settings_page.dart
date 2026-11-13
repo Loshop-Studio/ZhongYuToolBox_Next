@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/config/app_config.dart';
+import '../../core/storage/image_cache_manager.dart';
 import '../../core/storage/local_store.dart';
 import '../../core/storage/session_manager.dart';
 import '../../core/theme/app_theme.dart';
@@ -21,6 +22,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final SessionManager _session = SessionManager.instance;
   String? _switchingId;
+  bool _clearingImageCache = false;
 
   static const List<Color> _presets = [
     ThemePrefs.defaultBlue,
@@ -168,6 +170,26 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  Future<void> _clearImageCache() async {
+    final confirmed = await confirmDialog(
+      context,
+      title: '清除图片缓存',
+      content: '将删除图库、领创图标和随身答图片的本地缓存。下次查看时会重新下载。',
+      confirmText: '清除',
+      danger: true,
+    );
+    if (!confirmed || !mounted) return;
+    setState(() => _clearingImageCache = true);
+    try {
+      await ZyImageCacheManager.clear();
+      if (mounted) showToast(context, '图片缓存已清除');
+    } catch (e) {
+      if (mounted) showToast(context, '清除图片缓存失败：$e');
+    } finally {
+      if (mounted) setState(() => _clearingImageCache = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final session = _session;
@@ -226,6 +248,19 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
               const Divider(),
               _buildThemeSection(),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.delete_sweep_outlined),
+                title: const Text('清除图片缓存'),
+                subtitle: const Text('图库、领创图标和随身答图片'),
+                trailing: _clearingImageCache
+                    ? const SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.chevron_right),
+                onTap: _clearingImageCache ? null : _clearImageCache,
+              ),
               const Divider(),
               ListTile(
                 leading: const Icon(Icons.info_outline),

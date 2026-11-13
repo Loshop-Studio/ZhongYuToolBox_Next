@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/network/api_exception.dart';
+import '../../core/storage/image_cache_manager.dart';
 import '../../core/util/file_saver.dart';
 import '../../core/util/formatters.dart';
 import '../../data/api/picture_api.dart';
@@ -232,6 +233,7 @@ class _PictureDetailPageState extends State<PictureDetailPage> {
             child: Center(
               child: CachedNetworkImage(
                 imageUrl: galleryImageUrl(widget.items[index].picture),
+                cacheManager: ZyImageCacheManager.instance,
                 fit: BoxFit.contain,
                 placeholder: (_, __) =>
                     const Center(child: CircularProgressIndicator()),

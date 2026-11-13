@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../core/storage/image_cache_manager.dart';
 import '../../core/util/urls.dart';
 
 /// 用户头像：优先加载服务端返回的 photo，加载失败/为空时退回姓名首字
@@ -41,6 +42,7 @@ class UserAvatar extends StatelessWidget {
             ? fallback
             : CachedNetworkImage(
                 imageUrl: url,
+                cacheManager: ZyImageCacheManager.instance,
                 width: radius * 2,
                 height: radius * 2,
                 fit: BoxFit.cover,

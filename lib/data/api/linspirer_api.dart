@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../core/crypto/linspirer_crypto.dart';
 import '../../core/network/api_exception.dart';
@@ -121,6 +122,12 @@ class LinspirerApi {
       },
     );
     final data = result['data'];
+    if (kDebugMode) {
+      debugPrint(
+        '[Linspirer] gettactics data:\n${const JsonEncoder.withIndent('  ').convert(data)}',
+        wrapWidth: 1024,
+      );
+    }
     final list = <LinspirerApp>[];
     if (data is Map) {
       final tactics = data['app_tactics'];
@@ -167,6 +174,13 @@ class LinspirerApi {
       'appid': appId,
     });
     final data = result['data'];
+    if (kDebugMode) {
+      debugPrint(
+        '[Linspirer] getdetail appid=$appId data:\n'
+        '${const JsonEncoder.withIndent('  ').convert(data)}',
+        wrapWidth: 1024,
+      );
+    }
     return LinspirerAppDetail.fromJson(
       data is Map ? Map<String, dynamic>.from(data) : <String, dynamic>{},
     );
@@ -220,11 +234,9 @@ class LinspirerApi {
 
   static String _two(int value) => value.toString().padLeft(2, '0');
 
-  /// 静态资源代理（cloud.linspirer.com 的资源走 883）
+  /// 规范领创资源地址。图标资源必须保留 880 端口；下载接口使用 883。
   static String proxyUrl(String url) {
     if (url.isEmpty) return url;
-    return url
-        .replaceAll('http://cloud.linspirer.com:880', apiBase)
-        .replaceAll('https://cloud.linspirer.com:883', apiBase);
+    return url.replaceAll('https://cloud.linspirer.com:883', apiBase);
   }
 }
