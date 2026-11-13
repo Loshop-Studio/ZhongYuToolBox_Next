@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/config/app_config.dart';
 import '../../core/storage/session_manager.dart';
+import '../../core/web/app_webview_environment.dart';
 import '../../core/web/js_bridge.dart';
 import '../../shared/widgets/common.dart';
 import 'attachment_opener.dart';
@@ -63,6 +64,7 @@ class _LessonWebPageState extends State<LessonWebPage> {
     final title = widget.title.isNotEmpty
         ? widget.title
         : (widget.catalogId.isEmpty ? '优客畅学' : '章节内容');
+    final webViewError = AppWebViewEnvironment.initializationError;
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(onPressed: () => Navigator.of(context).maybePop()),
@@ -95,38 +97,41 @@ class _LessonWebPageState extends State<LessonWebPage> {
           const SizedBox(width: 4),
         ],
       ),
-      body: Stack(
-        children: [
-          Positioned.fill(child: _buildWebView()),
-          if (_loading)
-            const Positioned.fill(
-              child: ColoredBox(
-                color: Colors.white,
-                child: LoadingView(text: '正在加载课程内容…'),
-              ),
+      body: webViewError != null
+          ? ErrorView(message: webViewError)
+          : Stack(
+              children: [
+                Positioned.fill(child: _buildWebView()),
+                if (_loading)
+                  const Positioned.fill(
+                    child: ColoredBox(
+                      color: Colors.white,
+                      child: LoadingView(text: '正在加载课程内容…'),
+                    ),
+                  ),
+                if (_error != null)
+                  Positioned.fill(
+                    child: ColoredBox(
+                      color: Colors.white,
+                      child: ErrorView(
+                        message: _error!,
+                        onRetry: () => setState(() {
+                          _error = null;
+                          _loading = true;
+                          _reloadKey++;
+                        }),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-          if (_error != null)
-            Positioned.fill(
-              child: ColoredBox(
-                color: Colors.white,
-                child: ErrorView(
-                  message: _error!,
-                  onRetry: () => setState(() {
-                    _error = null;
-                    _loading = true;
-                    _reloadKey++;
-                  }),
-                ),
-              ),
-            ),
-        ],
-      ),
     );
   }
 
   Widget _buildWebView() {
     return InAppWebView(
       key: ValueKey<int>(_reloadKey),
+      webViewEnvironment: AppWebViewEnvironment.instance,
       initialUrlRequest: URLRequest(url: WebUri(_entryUrl)),
       initialSettings: InAppWebViewSettings(
         javaScriptEnabled: true,

@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/network/api_exception.dart';
 import '../../core/responsive/breakpoints.dart';
-import '../../core/theme/app_theme.dart';
 import '../../data/api/column_api.dart';
 import '../../data/models/column.dart';
 import '../../shared/widgets/common.dart';
@@ -189,15 +188,18 @@ class _StudyPageState extends State<StudyPage>
       onRefresh: _load,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 32),
+        padding: const EdgeInsets.only(top: 12, bottom: 32),
         children: [
-          AppTextField(
-            controller: _topicKeywordController,
-            hint: '搜索专栏名称',
-            onSubmitted: (_) => setState(() {}),
-            suffix: IconButton(
-              icon: const Icon(Icons.search, size: 20),
-              onPressed: () => setState(() {}),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: AppTextField(
+              controller: _topicKeywordController,
+              hint: '搜索专栏名称',
+              onSubmitted: (_) => setState(() {}),
+              suffix: IconButton(
+                icon: const Icon(Icons.search, size: 20),
+                onPressed: () => setState(() {}),
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -206,52 +208,49 @@ class _StudyPageState extends State<StudyPage>
           else
             for (final topic in topics)
               Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 6),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.label_outline,
-                              size: 16,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              topic.topicName.isEmpty
-                                  ? '未命名学科'
-                                  : topic.topicName,
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        for (final col in topic.cols)
-                          ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            dense: true,
-                            leading: const Icon(
-                              Icons.article_outlined,
-                              size: 18,
-                            ),
-                            title: Text(
-                              col.name,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 13.5),
-                            ),
-                            trailing: const Icon(Icons.chevron_right, size: 18),
-                            onTap: () => context.push(
-                              '/column/${col.id}?name=${Uri.encodeComponent(col.name)}',
-                            ),
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.label_outline,
+                            size: 16,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
-                      ],
+                          const SizedBox(width: 8),
+                          Text(
+                            topic.topicName.isEmpty ? '未命名学科' : topic.topicName,
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                    for (var index = 0; index < topic.cols.length; index++) ...[
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 2,
+                        ),
+                        leading: const Icon(Icons.article_outlined, size: 20),
+                        title: Text(
+                          topic.cols[index].name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        trailing: const Icon(Icons.chevron_right, size: 20),
+                        onTap: () => context.push(
+                          '/column/${topic.cols[index].id}?name=${Uri.encodeComponent(topic.cols[index].name)}',
+                        ),
+                      ),
+                      if (index < topic.cols.length - 1)
+                        const Divider(height: 1, indent: 56, endIndent: 16),
+                    ],
+                  ],
                 ),
               ),
         ],
@@ -271,43 +270,40 @@ class _StudyPageState extends State<StudyPage>
       onRefresh: _loadFavorites,
       child: ListView.separated(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 32),
+        padding: const EdgeInsets.only(top: 8, bottom: 32),
         itemCount: _favorites.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 8),
+        separatorBuilder: (_, _) =>
+            const Divider(height: 1, indent: 52, endIndent: 16),
         itemBuilder: (context, index) {
           final catalog = _favorites[index];
-          return Card(
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              onTap: () => context.push(
-                '/favorites/${catalog.id}?name=${Uri.encodeComponent(catalog.name)}',
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.bookmark_outline,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        catalog.name.isEmpty ? '未命名收藏夹' : catalog.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                    ),
-                    Text(
-                      '${catalog.collectCount} 篇',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    const SizedBox(width: 6),
-                    const Icon(Icons.chevron_right, size: 18),
-                  ],
+          return ListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 6,
+            ),
+            leading: Icon(
+              Icons.bookmark_outline,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            title: Text(
+              catalog.name.isEmpty ? '未命名收藏夹' : catalog.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${catalog.collectCount} 篇',
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
-              ),
+                const SizedBox(width: 6),
+                const Icon(Icons.chevron_right, size: 18),
+              ],
+            ),
+            onTap: () => context.push(
+              '/favorites/${catalog.id}?name=${Uri.encodeComponent(catalog.name)}',
             ),
           );
         },

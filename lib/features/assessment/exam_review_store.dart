@@ -231,6 +231,12 @@ class ExamReviewStore {
         .writeSecret(_mistakesKey(accountKey), jsonEncode(items.map((e) => e.toJson()).toList()));
   }
 
+  /// 未完成的测评通常没有题目分析，不能据此识别本人错题。
+  static bool canAnalyzeWrongQuestions(Map<String, dynamic>? data) {
+    final groups = data?['testGroupAnalysis'];
+    return groups is List && groups.isNotEmpty;
+  }
+
   /// 依据官方题目分析识别本人错题（复刻 analysisWrongQuestions）
   ///
   /// 只信 errorStudents 中的本人 studentId，不用班级错误数/姓名/分数。
@@ -249,7 +255,9 @@ class ExamReviewStore {
       for (final group in taskGroups) {
         if (group is Map && group['questions'] is List) {
           for (final question in group['questions'] as List) {
-            if (question is Map) questions.add(Map<String, dynamic>.from(question));
+            if (question is Map) {
+              questions.add(Map<String, dynamic>.from(question));
+            }
           }
         }
       }

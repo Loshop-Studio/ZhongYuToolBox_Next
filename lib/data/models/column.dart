@@ -241,3 +241,98 @@ class ColumnPageDetail {
     );
   }
 }
+
+/// 专栏文章评论。
+class ColumnComment {
+  const ColumnComment({
+    required this.id,
+    required this.userId,
+    required this.userName,
+    required this.userPicture,
+    required this.commentTime,
+    required this.content,
+    required this.isActive,
+    required this.isDeleted,
+    required this.allowReply,
+    required this.replies,
+  });
+
+  final int id;
+  final int userId;
+  final String userName;
+  final String userPicture;
+  final String commentTime;
+  final String content;
+  final bool isActive;
+  final bool isDeleted;
+  final bool allowReply;
+  final List<ColumnCommentReply> replies;
+
+  factory ColumnComment.fromJson(Map<String, dynamic> json) {
+    final replies = json['replies'];
+    return ColumnComment(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      userId: (json['commentUserId'] as num?)?.toInt() ?? 0,
+      userName: (json['commentUserFullName'] ?? '').toString().trim(),
+      userPicture: (json['commentUserPicture'] ?? '').toString(),
+      commentTime: (json['commentTime'] ?? '').toString(),
+      content: (json['comment'] ?? '').toString(),
+      isActive: json['isActive'] == true,
+      isDeleted: json['isDeleted'] == true,
+      allowReply: json['allowReply'] == true,
+      replies: replies is List
+          ? replies
+                .whereType<Map>()
+                .map(
+                  (e) =>
+                      ColumnCommentReply.fromJson(Map<String, dynamic>.from(e)),
+                )
+                .toList()
+          : <ColumnCommentReply>[],
+    );
+  }
+}
+
+/// 专栏文章评论下的回复。不同版本服务端字段名略有差异，因此保留兼容字段。
+class ColumnCommentReply {
+  const ColumnCommentReply({
+    required this.id,
+    required this.userName,
+    required this.userPicture,
+    required this.replyTime,
+    required this.content,
+  });
+
+  final int id;
+  final String userName;
+  final String userPicture;
+  final String replyTime;
+  final String content;
+
+  factory ColumnCommentReply.fromJson(Map<String, dynamic> json) {
+    return ColumnCommentReply(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      userName:
+          (json['replyUserFullName'] ??
+                  json['commentUserFullName'] ??
+                  json['userFullName'] ??
+                  '')
+              .toString()
+              .trim(),
+      userPicture:
+          (json['replyUserPicture'] ??
+                  json['commentUserPicture'] ??
+                  json['userPicture'] ??
+                  '')
+              .toString(),
+      replyTime:
+          (json['replyTime'] ??
+                  json['commentTime'] ??
+                  json['creationTime'] ??
+                  '')
+              .toString(),
+      content: (json['reply'] ?? json['comment'] ?? json['content'] ?? '')
+          .toString(),
+    );
+  }
+}

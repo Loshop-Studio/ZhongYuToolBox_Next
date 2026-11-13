@@ -1,3 +1,3 @@
 {
-    "cmake.sourceDirectory": "D:/Git Repos/ZhongYuToolBox_Next/windows"
+    "cmake.configureOnOpen": false
 }

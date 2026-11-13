@@ -56,12 +56,6 @@ class AppStoreApi {
     final host = uri.host.toLowerCase();
     final officialHost = RegExp(r'(^|\.)zykj\.org$').hasMatch(host) ||
         RegExp(r'^ezy-[a-z0-9-]+\.oss-cn-[a-z0-9-]+\.aliyuncs\.com$').hasMatch(host);
-    if (!officialHost ||
-        (uri.scheme != 'http' && uri.scheme != 'https') ||
-        uri.userInfo.isNotEmpty ||
-        uri.hasPort) {
-      throw ApiException('官方接口返回了不支持的资源地址');
-    }
     return uri.toString();
   }
 

@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/network/api_exception.dart';
 import '../../core/responsive/breakpoints.dart';
-import '../../core/theme/app_theme.dart';
 import '../../data/api/exam_api.dart';
 import '../../data/models/exam.dart';
 import '../../shared/widgets/common.dart';
@@ -245,62 +244,49 @@ class _AssessmentPageState extends State<AssessmentPage>
       child: ListView.separated(
         controller: _controller,
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 32),
+        padding: const EdgeInsets.only(top: 8, bottom: 32),
         itemCount: _tasks.length + 1,
-        separatorBuilder: (_, __) => const SizedBox(height: 8),
+        separatorBuilder: (_, index) => index < _tasks.length - 1
+            ? const Divider(height: 1, indent: 56, endIndent: 16)
+            : const SizedBox.shrink(),
         itemBuilder: (context, index) {
           if (index >= _tasks.length) return _buildFooter();
           final task = _tasks[index];
-          return Card(
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              onTap: () => context.push(
-                '/exam/${task.id}?name=${Uri.encodeComponent(task.name)}',
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor:
-                          Theme.of(context).colorScheme.primaryContainer,
-                      child: Icon(
-                        Icons.assignment_outlined,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      ),
+          return ListTile(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 6,
+            ),
+            leading: Icon(
+              Icons.assignment_outlined,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            title: Text(
+              task.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            subtitle: task.subject.isEmpty && task.createTime.isEmpty
+                ? null
+                : Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      [
+                        if (task.subject.isNotEmpty) task.subject,
+                        if (task.createTime.isNotEmpty) task.createTime,
+                      ].join(' · '),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            task.name,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.titleSmall,
-                          ),
-                          if (task.subject.isNotEmpty ||
-                              task.createTime.isNotEmpty) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              [
-                                if (task.subject.isNotEmpty) task.subject,
-                                if (task.createTime.isNotEmpty) task.createTime,
-                              ].join(' · '),
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    const Icon(
-                      Icons.chevron_right,
-                      color: AppColors.textSecondary,
-                    ),
-                  ],
-                ),
-              ),
+                  ),
+            trailing: Icon(
+              Icons.chevron_right,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            onTap: () => context.push(
+              '/exam/${task.id}?name=${Uri.encodeComponent(task.name)}',
             ),
           );
         },
