@@ -1,7 +1,7 @@
 name: zhongyu_toolbox
 description: "中育工具箱（Flutter 版）：资源 / 测评 / 主页 / 学习 / 问答"
 publish_to: 'none'
-version: 9.9.9+999
+version: 1.0.10+1005
 
 environment:
   sdk: ^3.10.7
