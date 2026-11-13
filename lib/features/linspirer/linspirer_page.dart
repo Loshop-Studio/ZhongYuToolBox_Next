@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../core/network/api_exception.dart';
 import '../../core/responsive/breakpoints.dart';
+import '../../core/storage/image_cache_manager.dart';
 import '../../core/storage/local_store.dart';
 import '../../core/storage/session_manager.dart';
 import '../../core/theme/app_theme.dart';
@@ -36,6 +38,7 @@ class _LinspirerPageState extends State<LinspirerPage>
   String _studentId = '';
 
   bool _binding = false;
+  bool _editingBinding = false;
   bool _loadingApps = false;
   List<LinspirerApp> _apps = <LinspirerApp>[];
 
@@ -90,6 +93,7 @@ class _LinspirerPageState extends State<LinspirerPage>
         _boundSwdid = swdid;
         _boundModel = model;
         _apps = <LinspirerApp>[];
+        _editingBinding = false;
       });
       await LocalStore.instance.setString('linspirer_swdid', swdid);
       await LocalStore.instance.setString('linspirer_model', model);
@@ -152,7 +156,10 @@ class _LinspirerPageState extends State<LinspirerPage>
       final url = LinspirerApi.proxyUrl(path);
       if (!mounted) return;
       showToast(context, '开始下载 ${app.name}');
-      final saved = await downloadAttachment(url, app.name);
+      final saved = await downloadAttachment(
+        url,
+        detail.downloadFileName(app.name),
+      );
       if (!mounted) return;
       showToast(context, saved == null ? '已取消保存' : '已保存：$saved');
     } catch (e) {
@@ -221,6 +228,27 @@ class _LinspirerPageState extends State<LinspirerPage>
   }
 
   Widget _buildBind() {
+    if (_boundSwdid.isNotEmpty && !_editingBinding) {
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(12, 16, 12, 32),
+        children: [
+          Text('设备已绑定', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 12),
+          Text('设备号：$_boundSwdid'),
+          const SizedBox(height: 6),
+          Text('设备型号：${_boundModel.isEmpty ? '—' : _boundModel}'),
+          const SizedBox(height: 6),
+          Text('用户名：$_account'),
+          const SizedBox(height: 20),
+          OutlinedButton.icon(
+            onPressed: () => setState(() => _editingBinding = true),
+            icon: const Icon(Icons.edit_outlined),
+            label: const Text('更换设备'),
+          ),
+        ],
+      );
+    }
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(12, 16, 12, 32),
       children: [
@@ -253,6 +281,13 @@ class _LinspirerPageState extends State<LinspirerPage>
               : const Icon(Icons.link),
           label: const Text('绑定并获取应用'),
         ),
+        if (_boundSwdid.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () => setState(() => _editingBinding = false),
+            child: const Text('取消更换'),
+          ),
+        ],
       ],
     );
   }
@@ -294,74 +329,13 @@ class _LinspirerPageState extends State<LinspirerPage>
             );
           }
           final app = _apps[index];
-          return Card(
-            clipBehavior: Clip.antiAlias,
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: SizedBox(
-                      width: 48,
-                      height: 48,
-                      child: app.icon.isEmpty
-                          ? const ColoredBox(
-                              color: AppColors.field,
-                              child: Icon(Icons.android),
-                            )
-                          : Image.network(
-                              LinspirerApi.proxyUrl(app.icon),
-                              fit: BoxFit.contain,
-                              errorBuilder: (_, __, ___) =>
-                                  const Icon(Icons.android),
-                            ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          app.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          app.packageName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        const SizedBox(height: 4),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Chip(
-                            visualDensity: VisualDensity.compact,
-                            label: Text(app.source),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      TextButton(
-                        onPressed: () => _viewApp(app),
-                        child: const Text('详情'),
-                      ),
-                      TextButton(
-                        onPressed: () => _downloadApp(app),
-                        child: const Text('下载'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+          return _LinspirerAppCard(
+            app: app,
+            swdid: _boundSwdid,
+            account: _account,
+            model: _boundModel,
+            onView: () => _viewApp(app),
+            onDownload: () => _downloadApp(app),
           );
         },
       ),
@@ -442,6 +416,126 @@ class _LinspirerPageState extends State<LinspirerPage>
   }
 }
 
+class _LinspirerAppCard extends StatefulWidget {
+  const _LinspirerAppCard({
+    required this.app,
+    required this.swdid,
+    required this.account,
+    required this.model,
+    required this.onView,
+    required this.onDownload,
+  });
+
+  final LinspirerApp app;
+  final String swdid;
+  final String account;
+  final String model;
+  final VoidCallback onView;
+  final VoidCallback onDownload;
+
+  @override
+  State<_LinspirerAppCard> createState() => _LinspirerAppCardState();
+}
+
+class _LinspirerAppCardState extends State<_LinspirerAppCard> {
+  String _icon = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _icon = widget.app.icon;
+    if (_icon.isEmpty) _loadDetailIcon();
+  }
+
+  Future<void> _loadDetailIcon() async {
+    try {
+      final detail = await LinspirerApi.getAppDetail(
+        widget.swdid,
+        widget.account,
+        widget.model,
+        widget.app.id,
+      );
+      if (!mounted || detail.icon.isEmpty) return;
+      setState(() => _icon = detail.icon);
+    } catch (_) {
+      // 图标加载失败时保留默认图标，不影响应用列表使用。
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: SizedBox(
+                width: 48,
+                height: 48,
+                child: _icon.isEmpty
+                    ? const ColoredBox(
+                        color: AppColors.field,
+                        child: Icon(Icons.android),
+                      )
+                    : CachedNetworkImage(
+                        imageUrl: LinspirerApi.proxyUrl(_icon),
+                        cacheManager: ZyImageCacheManager.instance,
+                        fit: BoxFit.contain,
+                        errorWidget: (_, __, ___) => const ColoredBox(
+                          color: AppColors.field,
+                          child: Icon(Icons.android),
+                        ),
+                      ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.app.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    widget.app.packageName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 4),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Chip(
+                      visualDensity: VisualDensity.compact,
+                      label: Text(widget.app.source),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              children: [
+                TextButton(onPressed: widget.onView, child: const Text('详情')),
+                TextButton(
+                  onPressed: widget.onDownload,
+                  child: const Text('下载'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _AppDetailDialog extends StatefulWidget {
   const _AppDetailDialog({
     required this.app,
@@ -495,6 +589,9 @@ class _AppDetailDialogState extends State<_AppDetailDialog> {
   @override
   Widget build(BuildContext context) {
     final detail = _detail;
+    final icon = detail?.icon.isNotEmpty == true
+        ? detail!.icon
+        : widget.app.icon;
     return AlertDialog(
       title: Text(widget.app.name),
       content: SizedBox(
@@ -510,13 +607,14 @@ class _AppDetailDialogState extends State<_AppDetailDialog> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (widget.app.icon.isNotEmpty)
+                        if (icon.isNotEmpty)
                           Center(
-                            child: Image.network(
-                              LinspirerApi.proxyUrl(widget.app.icon),
+                            child: CachedNetworkImage(
+                              imageUrl: LinspirerApi.proxyUrl(icon),
+                              cacheManager: ZyImageCacheManager.instance,
                               width: 64,
                               height: 64,
-                              errorBuilder: (_, __, ___) =>
+                              errorWidget: (_, __, ___) =>
                                   const Icon(Icons.android, size: 48),
                             ),
                           ),
@@ -549,7 +647,10 @@ class _AppDetailDialogState extends State<_AppDetailDialog> {
               Navigator.of(context).pop();
               showToast(context, '开始下载 ${widget.app.name}');
               try {
-                final saved = await downloadAttachment(url, widget.app.name);
+                final saved = await downloadAttachment(
+                  url,
+                  detail.downloadFileName(widget.app.name),
+                );
                 if (!context.mounted) return;
                 showToast(context, saved == null ? '已取消保存' : '已保存：$saved');
               } catch (e) {

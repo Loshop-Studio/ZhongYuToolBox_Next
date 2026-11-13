@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/network/api_exception.dart';
+import '../../core/storage/image_cache_manager.dart';
 import '../../core/util/formatters.dart';
 import '../../core/util/urls.dart';
 import '../../data/api/quora_api.dart';
@@ -296,6 +297,7 @@ class _QaDetailPageState extends State<QaDetailPage> {
               borderRadius: BorderRadius.circular(8),
               child: CachedNetworkImage(
                 imageUrl: imageDisplayUrl(absoluteOssUrl(message.snapshot)),
+                cacheManager: ZyImageCacheManager.instance,
                 width: double.infinity,
                 fit: BoxFit.fitWidth,
                 errorWidget: (_, __, ___) => const SizedBox.shrink(),
@@ -334,6 +336,7 @@ class _QaDetailPageState extends State<QaDetailPage> {
         child: InteractiveViewer(
           child: CachedNetworkImage(
             imageUrl: imageDisplayUrl(absoluteOssUrl(snapshot)),
+            cacheManager: ZyImageCacheManager.instance,
             fit: BoxFit.contain,
           ),
         ),

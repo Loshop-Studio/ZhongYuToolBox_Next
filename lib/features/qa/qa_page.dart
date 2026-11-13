@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/config/app_config.dart';
 import '../../core/network/api_exception.dart';
 import '../../core/responsive/breakpoints.dart';
+import '../../core/storage/image_cache_manager.dart';
 import '../../core/util/urls.dart';
 import '../../data/api/quora_api.dart';
 import '../../data/models/quora.dart';
@@ -555,6 +556,7 @@ class _SessionCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   child: CachedNetworkImage(
                     imageUrl: imageDisplayUrl(absoluteOssUrl(session.snapshot)),
+                    cacheManager: ZyImageCacheManager.instance,
                     height: 100,
                     width: double.infinity,
                     fit: BoxFit.cover,
