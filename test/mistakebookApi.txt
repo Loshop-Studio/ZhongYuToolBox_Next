@@ -1,0 +1,515 @@
+# 新版本错题本主页不再分学科，这是获取所有的代码
+Request
+POST http://sxz.api.zykj.org/api/services/app/MistakeBook/SearchMistakeQstItemsAsync HTTP/1.1
+AppName: Mistake
+AppVersion: 10205
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMwODc1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IjI0d3V5aXh1YW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTdHVkZW50Iiwic3ViIjoiMzA4NzUiLCJqdGkiOiI3ZDVhOGZjNi01ZWRlLTQ1OTctYmI3Ni01MjI1YjVjNzY4M2YiLCJpYXQiOjE3OTQ2MDkyOTIsIm5iZiI6MTc5NDYwOTI5MiwiZXhwIjoxNzk0NjE2NDkyLCJpc3MiOiJFenkiLCJhdWQiOiJTWFoifQ.tn7ytyaEMFvPTdaX2SxrAdlCA1knUGC_cl_TTspxDHM
+Content-Type: application/json; charset=UTF-8
+Content-Length: 141
+Host: sxz.api.zykj.org
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.12.0
+
+
+{"attainedLevel":[],"diff":[],"errorReason":[],"haveNoTag":false,"maxResultCount":20,"skipCount":0,"tagIdList":[],"timeType":0,"topicIds":[]}
+
+--------------------------------------------------------
+
+Response
+HTTP/1.1 200
+Date: Fri, 13 Nov 2026 23:11:42 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 10907
+Connection: keep-alive
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
+Access-Control-Allow-Headers: appname,appversion,content-type,authorization,refreshtoken,clientcode
+Access-Control-Max-Age: 1728000
+Cache-Control: no-cache
+
+{"result":{"masteredCount":0,"totalCount":75,"items":[{"bookId":53806,"source":null,"title":"jj","creationTime":"2026-11-14 06:54:49","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261114/786676cbb42e487db2098540669cb2ce.jpg","hasStem":false,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":4,"topicName":"语文","examName":null,"collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":null,"name":null,"id":1450262},{"bookId":54032,"source":"2027届高三物理补充作业13","title":null,"creationTime":"2026-11-07 18:57:53","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261107/4e350b21-8b1e-4a4d-8b65-a4c0689b160e/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":7,"topicName":"物理","examName":"2027届高三物理补充作业13","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"7","name":"","id":1444957},{"bookId":54032,"source":"2027届高三物理补充作业13","title":null,"creationTime":"2026-11-07 18:57:46","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261107/aba1a0bb-1015-45b2-b672-2f5a3018f367/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":7,"topicName":"物理","examName":"2027届高三物理补充作业13","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"6","name":"","id":1444956},{"bookId":54032,"source":"2027届高三物理补充作业13","title":null,"creationTime":"2026-11-07 18:57:39","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261107/86bff47e-f761-4b29-bbd8-71de3d9cb8a6/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":7,"topicName":"物理","examName":"2027届高三物理补充作业13","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"3","name":"","id":1444955},{"bookId":54032,"source":"2027届高三物理补充作业13","title":null,"creationTime":"2026-11-07 18:57:32","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261107/b71fcb8b-cc98-4c7f-a8c6-da37bd38d545/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":7,"topicName":"物理","examName":"2027届高三物理补充作业13","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"2","name":"","id":1444954},{"bookId":65708,"source":null,"title":"zz","creationTime":"2026-11-02 09:11:49","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261102/d105f312d53243aeb413130b5073e2cd.jpg","hasStem":false,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":9,"topicName":"生物","examName":null,"collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":null,"name":null,"id":1439718},{"bookId":57436,"source":null,"title":"。","creationTime":"2026-10-30 06:43:21","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261030/af4b4efcb30d4000ac8d0b712aae3718.jpg","hasStem":false,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":24,"topicName":"体育与健康","examName":null,"collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":null,"name":null,"id":1436716},{"bookId":46092,"source":null,"title":"deal","creationTime":"2026-10-15 15:13:38","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261015/07324570d28444b7aac29ea295430e5a.jpg","hasStem":false,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":93,"topicName":"其他","examName":null,"collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":null,"name":null,"id":1422773},{"bookId":53806,"source":null,"title":"1","creationTime":"2026-10-12 06:38:58","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261012/ab75f0b8b8384a2faa1ee3f6ca5aaf33.jpg","hasStem":false,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":4,"topicName":"语文","examName":null,"collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":null,"name":null,"id":1420227},{"bookId":53806,"source":null,"title":"q","creationTime":"2026-10-06 08:42:57","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261006/5eeb9a9a02e14b489985bb67922e5f94.jpg","hasStem":false,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":4,"topicName":"语文","examName":null,"collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":null,"name":null,"id":1415849},{"bookId":64088,"source":null,"title":"斤斤计较进度嘟嘟姐","creationTime":"2026-10-03 15:26:00","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261003/9fbac5687a3c494fb290e757963fb9cb.jpg","hasStem":false,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":["Loshop Wu","发送"],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":66,"topicName":"调查问卷","examName":null,"collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":null,"name":null,"id":1414972},{"bookId":53806,"source":null,"title":"1","creationTime":"2026-10-03 15:12:42","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261003/26452dbf5e754c998059144925a76989.jpg","hasStem":false,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":4,"topicName":"语文","examName":null,"collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":null,"name":null,"id":1414959},{"bookId":44176,"source":"正误判断2：物质结构（国庆作业二）","title":null,"creationTime":"2026-10-02 18:45:49","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261002/f904e86e-f407-4b7c-be1e-7ef656224791/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":8,"topicName":"化学","examName":"正误判断2：物质结构（国庆作业二）","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"72","name":"","id":1414693},{"bookId":44176,"source":"正误判断2：物质结构（国庆作业二）","title":null,"creationTime":"2026-10-02 18:45:48","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261002/e0924e36-c9e3-4472-9afd-a82c5a6ae01f/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":8,"topicName":"化学","examName":"正误判断2：物质结构（国庆作业二）","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"45","name":"","id":1414692},{"bookId":44176,"source":"正误判断2：物质结构（国庆作业二）","title":null,"creationTime":"2026-10-02 18:45:47","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261002/00ba671d-8ed3-44e1-aafd-210977c1ae8b/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":8,"topicName":"化学","examName":"正误判断2：物质结构（国庆作业二）","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"44","name":"","id":1414691},{"bookId":44176,"source":"正误判断2：物质结构（国庆作业二）","title":null,"creationTime":"2026-10-02 18:45:46","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261002/2df1e11f-5d05-4243-80d2-d5c56de36ed9/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":8,"topicName":"化学","examName":"正误判断2：物质结构（国庆作业二）","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"36","name":"","id":1414690},{"bookId":44176,"source":"正误判断2：物质结构（国庆作业二）","title":null,"creationTime":"2026-10-02 18:45:46","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261002/1cc394a4-a957-4e39-8e00-3311805d53d4/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":8,"topicName":"化学","examName":"正误判断2：物质结构（国庆作业二）","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"35","name":"","id":1414689},{"bookId":46077,"source":"高三数学国庆作业三","title":null,"creationTime":"2026-10-01 17:18:58","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261001/40d2f6db-e837-4e03-8466-55d8d80524f1/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":5,"topicName":"数学","examName":"高三数学国庆作业三","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"9","name":"","id":1414335},{"bookId":46077,"source":"高三数学国庆作业三","title":null,"creationTime":"2026-10-01 17:18:55","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261001/ddbfb894-17b0-4c4d-9bd7-f48195ac68f6/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":5,"topicName":"数学","examName":"高三数学国庆作业三","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"8","name":"","id":1414334},{"bookId":46077,"source":"高三数学十一假期作业2","title":null,"creationTime":"2026-10-01 17:18:38","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261001/10e596c3-adf6-43ae-94c2-68631c445ecb/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":5,"topicName":"数学","examName":"高三数学十一假期作业2","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"10","name":"","id":1414333}]},"targetUrl":null,"success":true,"error":null,"unAuthorizedRequest":false,"__abp":true}
+
+
+
+#主页有一些纯信息展示，不用交互
+Request
+GET http://sxz.api.zykj.org/api/services/app/MistakeReview/GetReviewHomeAsync HTTP/1.1
+AppName: Mistake
+AppVersion: 10205
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMwODc1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IjI0d3V5aXh1YW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTdHVkZW50Iiwic3ViIjoiMzA4NzUiLCJqdGkiOiI3ZDVhOGZjNi01ZWRlLTQ1OTctYmI3Ni01MjI1YjVjNzY4M2YiLCJpYXQiOjE3OTQ2MDkyOTIsIm5iZiI6MTc5NDYwOTI5MiwiZXhwIjoxNzk0NjE2NDkyLCJpc3MiOiJFenkiLCJhdWQiOiJTWFoifQ.tn7ytyaEMFvPTdaX2SxrAdlCA1knUGC_cl_TTspxDHM
+Host: sxz.api.zykj.org
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.12.0
+
+
+
+
+--------------------------------------------------------
+
+Response
+HTTP/1.1 200
+Date: Fri, 13 Nov 2026 23:11:48 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 920
+Connection: keep-alive
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
+Access-Control-Allow-Headers: appname,appversion,content-type,authorization,refreshtoken,clientcode
+Access-Control-Max-Age: 1728000
+Cache-Control: no-cache
+
+{"result":{"recommendCount":0,"shouldDefaultReviewTab":false,"recommend":{"mode":1,"name":"推荐练习","description":"按记忆节奏推荐今天该练的题","count":0,"canPractice":false},"needStrengthen":{"mode":2,"name":"待加强","description":"推荐练习中做错或需要重点复习的题","count":0,"canPractice":false},"consolidating":{"mode":3,"name":"巩固中","description":"正在按复习计划巩固的题","count":0,"canPractice":false},"mastered":{"mode":4,"name":"已掌握","description":"已完成常规复习，可自由抽查","count":0,"canPractice":false},"performance":{"summaryText":"当前没有可练题，新增错题后这里会自动生成复习计划","newMistakeCount":1,"practiceQuestionCount":0,"practiceDayCount":0,"consolidatingItemCount":0,"masteredItemCount":0,"continuousReviewDays":0}},"targetUrl":null,"success":true,"error":null,"unAuthorizedRequest":false,"__abp":true}
+
+#现在有“错题集”功能，这是获取错题集列表
+Request
+GET http://sxz.api.zykj.org/api/services/app/MistakeCollection/GetMyCollectionsAsync HTTP/1.1
+AppName: Mistake
+AppVersion: 10205
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMwODc1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IjI0d3V5aXh1YW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTdHVkZW50Iiwic3ViIjoiMzA4NzUiLCJqdGkiOiI3ZDVhOGZjNi01ZWRlLTQ1OTctYmI3Ni01MjI1YjVjNzY4M2YiLCJpYXQiOjE3OTQ2MDkyOTIsIm5iZiI6MTc5NDYwOTI5MiwiZXhwIjoxNzk0NjE2NDkyLCJpc3MiOiJFenkiLCJhdWQiOiJTWFoifQ.tn7ytyaEMFvPTdaX2SxrAdlCA1knUGC_cl_TTspxDHM
+Host: sxz.api.zykj.org
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.12.0
+
+
+
+
+--------------------------------------------------------
+
+Response
+HTTP/1.1 200
+Date: Fri, 13 Nov 2026 23:14:02 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 219
+Connection: keep-alive
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
+Access-Control-Allow-Headers: appname,appversion,content-type,authorization,refreshtoken,clientcode
+Access-Control-Max-Age: 1728000
+Cache-Control: no-cache
+
+{"result":{"totalCount":1,"items":[{"name":"测试","description":null,"itemCount":1,"creationTime":"2026-11-14 06:54:21","id":19}]},"targetUrl":null,"success":true,"error":null,"unAuthorizedRequest":false,"__abp":true}
+
+#从错题集里获取错题
+Request
+POST http://sxz.api.zykj.org/api/services/app/MistakeCollection/GetCollectionItemsAsync HTTP/1.1
+AppName: Mistake
+AppVersion: 10205
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMwODc1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IjI0d3V5aXh1YW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTdHVkZW50Iiwic3ViIjoiMzA4NzUiLCJqdGkiOiI3ZDVhOGZjNi01ZWRlLTQ1OTctYmI3Ni01MjI1YjVjNzY4M2YiLCJpYXQiOjE3OTQ2MDkyOTIsIm5iZiI6MTc5NDYwOTI5MiwiZXhwIjoxNzk0NjE2NDkyLCJpc3MiOiJFenkiLCJhdWQiOiJTWFoifQ.tn7ytyaEMFvPTdaX2SxrAdlCA1knUGC_cl_TTspxDHM
+Content-Type: application/json; charset=UTF-8
+Content-Length: 84
+Host: sxz.api.zykj.org
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.12.0
+
+
+{"collectionId":19,"maxResultCount":20,"skipCount":0,"sortDirection":1,"sortType":0}
+
+--------------------------------------------------------
+
+Response
+HTTP/1.1 200
+Date: Fri, 13 Nov 2026 23:14:27 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 716
+Connection: keep-alive
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
+Access-Control-Allow-Headers: appname,appversion,content-type,authorization,refreshtoken,clientcode
+Access-Control-Max-Age: 1728000
+Cache-Control: no-cache
+
+{"result":{"totalCount":1,"items":[{"isInCurrentCollection":true,"isInOtherCollection":false,"bookId":54032,"source":"2027届高三物理补充作业13","title":null,"creationTime":"2026-11-07 18:57:53","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261107/4e350b21-8b1e-4a4d-8b65-a4c0689b160e/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":7,"topicName":"物理","examName":"2027届高三物理补充作业13","isMastered":false,"isRelatedQstGroup":false,"number":"7","name":"","id":1444957}]},"targetUrl":null,"success":true,"error":null,"unAuthorizedRequest":false,"__abp":true}
+
+#从错题集移除错题（不是删除）
+Request
+POST http://sxz.api.zykj.org/api/services/app/MistakeCollection/RemoveItemsFromCollectionAsync HTTP/1.1
+AppName: Mistake
+AppVersion: 10205
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMwODc1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IjI0d3V5aXh1YW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTdHVkZW50Iiwic3ViIjoiMzA4NzUiLCJqdGkiOiI3ZDVhOGZjNi01ZWRlLTQ1OTctYmI3Ni01MjI1YjVjNzY4M2YiLCJpYXQiOjE3OTQ2MDkyOTIsIm5iZiI6MTc5NDYwOTI5MiwiZXhwIjoxNzk0NjE2NDkyLCJpc3MiOiJFenkiLCJhdWQiOiJTWFoifQ.tn7ytyaEMFvPTdaX2SxrAdlCA1knUGC_cl_TTspxDHM
+Content-Type: application/json; charset=UTF-8
+Content-Length: 63
+Host: sxz.api.zykj.org
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.12.0
+
+
+{"collectionId":19,"itemIds":[1444957,1444956,1439718,1420227]}
+
+--------------------------------------------------------
+
+Response
+HTTP/1.1 200
+Date: Fri, 13 Nov 2026 23:16:25 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 101
+Connection: keep-alive
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
+Access-Control-Allow-Headers: appname,appversion,content-type,authorization,refreshtoken,clientcode
+Access-Control-Max-Age: 1728000
+Cache-Control: no-cache
+
+{"result":null,"targetUrl":null,"success":true,"error":null,"unAuthorizedRequest":false,"__abp":true}
+
+#将错题加入错题集
+Request
+POST http://sxz.api.zykj.org/api/services/app/MistakeCollection/SyncItemsToCollectionsAsync HTTP/1.1
+AppName: Mistake
+AppVersion: 10205
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMwODc1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IjI0d3V5aXh1YW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTdHVkZW50Iiwic3ViIjoiMzA4NzUiLCJqdGkiOiI3ZDVhOGZjNi01ZWRlLTQ1OTctYmI3Ni01MjI1YjVjNzY4M2YiLCJpYXQiOjE3OTQ2MDkyOTIsIm5iZiI6MTc5NDYwOTI5MiwiZXhwIjoxNzk0NjE2NDkyLCJpc3MiOiJFenkiLCJhdWQiOiJTWFoifQ.tn7ytyaEMFvPTdaX2SxrAdlCA1knUGC_cl_TTspxDHM
+Content-Type: application/json; charset=UTF-8
+Content-Length: 42
+Host: sxz.api.zykj.org
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.12.0
+
+
+{"collectionIds":[19],"itemIds":[1444957]}
+
+--------------------------------------------------------
+
+Response
+HTTP/1.1 200
+Date: Fri, 13 Nov 2026 23:16:53 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 101
+Connection: keep-alive
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
+Access-Control-Allow-Headers: appname,appversion,content-type,authorization,refreshtoken,clientcode
+Access-Control-Max-Age: 1728000
+Cache-Control: no-cache
+
+{"result":null,"targetUrl":null,"success":true,"error":null,"unAuthorizedRequest":false,"__abp":true}
+
+
+#删除错题集
+Request
+POST http://sxz.api.zykj.org/api/services/app/MistakeCollection/DeleteAsync HTTP/1.1
+AppName: Mistake
+AppVersion: 10205
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMwODc1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IjI0d3V5aXh1YW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTdHVkZW50Iiwic3ViIjoiMzA4NzUiLCJqdGkiOiI3ZDVhOGZjNi01ZWRlLTQ1OTctYmI3Ni01MjI1YjVjNzY4M2YiLCJpYXQiOjE3OTQ2MDkyOTIsIm5iZiI6MTc5NDYwOTI5MiwiZXhwIjoxNzk0NjE2NDkyLCJpc3MiOiJFenkiLCJhdWQiOiJTWFoifQ.tn7ytyaEMFvPTdaX2SxrAdlCA1knUGC_cl_TTspxDHM
+Content-Type: application/json; charset=UTF-8
+Content-Length: 22
+Host: sxz.api.zykj.org
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.12.0
+
+
+{"collectionIds":[19]}
+
+--------------------------------------------------------
+
+Response
+HTTP/1.1 200
+Date: Fri, 13 Nov 2026 23:17:14 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 101
+Connection: keep-alive
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
+Access-Control-Allow-Headers: appname,appversion,content-type,authorization,refreshtoken,clientcode
+Access-Control-Max-Age: 1728000
+Cache-Control: no-cache
+
+{"result":null,"targetUrl":null,"success":true,"error":null,"unAuthorizedRequest":false,"__abp":true}
+
+#创建错题集
+Request
+POST http://sxz.api.zykj.org/api/services/app/MistakeCollection/CreateOrUpdateAsync HTTP/1.1
+AppName: Mistake
+AppVersion: 10205
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMwODc1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IjI0d3V5aXh1YW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTdHVkZW50Iiwic3ViIjoiMzA4NzUiLCJqdGkiOiI3ZDVhOGZjNi01ZWRlLTQ1OTctYmI3Ni01MjI1YjVjNzY4M2YiLCJpYXQiOjE3OTQ2MDkyOTIsIm5iZiI6MTc5NDYwOTI5MiwiZXhwIjoxNzk0NjE2NDkyLCJpc3MiOiJFenkiLCJhdWQiOiJTWFoifQ.tn7ytyaEMFvPTdaX2SxrAdlCA1knUGC_cl_TTspxDHM
+Content-Type: application/json; charset=UTF-8
+Content-Length: 27
+Host: sxz.api.zykj.org
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.12.0
+
+
+{"id":0,"name":"哥哦付"}
+
+--------------------------------------------------------
+
+Response
+HTTP/1.1 200
+Date: Fri, 13 Nov 2026 23:17:28 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 125
+Connection: keep-alive
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
+Access-Control-Allow-Headers: appname,appversion,content-type,authorization,refreshtoken,clientcode
+Access-Control-Max-Age: 1728000
+Cache-Control: no-cache
+
+{"result":{"name":"哥哦付","id":81},"targetUrl":null,"success":true,"error":null,"unAuthorizedRequest":false,"__abp":true}
+
+id=0就是创建，等于其它就是修改名称
+
+#带筛选的请求
+Request
+POST http://sxz.api.zykj.org/api/services/app/MistakeBook/SearchMistakeQstItemsAsync HTTP/1.1
+AppName: Mistake
+AppVersion: 10205
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMwODc1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IjI0d3V5aXh1YW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTdHVkZW50Iiwic3ViIjoiMzA4NzUiLCJqdGkiOiI3ZDVhOGZjNi01ZWRlLTQ1OTctYmI3Ni01MjI1YjVjNzY4M2YiLCJpYXQiOjE3OTQ2MDkyOTIsIm5iZiI6MTc5NDYwOTI5MiwiZXhwIjoxNzk0NjE2NDkyLCJpc3MiOiJFenkiLCJhdWQiOiJTWFoifQ.tn7ytyaEMFvPTdaX2SxrAdlCA1knUGC_cl_TTspxDHM
+Content-Type: application/json; charset=UTF-8
+Content-Length: 141
+Host: sxz.api.zykj.org
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.12.0
+
+
+{"attainedLevel":[],"diff":[],"errorReason":[],"haveNoTag":false,"maxResultCount":20,"skipCount":0,"tagIdList":[],"timeType":2,"topicIds":[]}
+
+--------------------------------------------------------
+
+Response
+HTTP/1.1 200
+Date: Fri, 13 Nov 2026 23:18:35 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 4327
+Connection: keep-alive
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
+Access-Control-Allow-Headers: appname,appversion,content-type,authorization,refreshtoken,clientcode
+Access-Control-Max-Age: 1728000
+Cache-Control: no-cache
+
+{"result":{"masteredCount":0,"totalCount":8,"items":[{"bookId":53806,"source":null,"title":"jj","creationTime":"2026-11-14 06:54:49","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261114/786676cbb42e487db2098540669cb2ce.jpg","hasStem":false,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":4,"topicName":"语文","examName":null,"collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":null,"name":null,"id":1450262},{"bookId":54032,"source":"2027届高三物理补充作业13","title":null,"creationTime":"2026-11-07 18:57:53","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261107/4e350b21-8b1e-4a4d-8b65-a4c0689b160e/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":7,"topicName":"物理","examName":"2027届高三物理补充作业13","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"7","name":"","id":1444957},{"bookId":54032,"source":"2027届高三物理补充作业13","title":null,"creationTime":"2026-11-07 18:57:46","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261107/aba1a0bb-1015-45b2-b672-2f5a3018f367/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":7,"topicName":"物理","examName":"2027届高三物理补充作业13","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"6","name":"","id":1444956},{"bookId":54032,"source":"2027届高三物理补充作业13","title":null,"creationTime":"2026-11-07 18:57:39","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261107/86bff47e-f761-4b29-bbd8-71de3d9cb8a6/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":7,"topicName":"物理","examName":"2027届高三物理补充作业13","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"3","name":"","id":1444955},{"bookId":54032,"source":"2027届高三物理补充作业13","title":null,"creationTime":"2026-11-07 18:57:32","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261107/b71fcb8b-cc98-4c7f-a8c6-da37bd38d545/stem.png","hasStem":true,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":7,"topicName":"物理","examName":"2027届高三物理补充作业13","collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":"2","name":"","id":1444954},{"bookId":65708,"source":null,"title":"zz","creationTime":"2026-11-02 09:11:49","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261102/d105f312d53243aeb413130b5073e2cd.jpg","hasStem":false,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":9,"topicName":"生物","examName":null,"collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":null,"name":null,"id":1439718},{"bookId":57436,"source":null,"title":"。","creationTime":"2026-10-30 06:43:21","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261030/af4b4efcb30d4000ac8d0b712aae3718.jpg","hasStem":false,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":24,"topicName":"体育与健康","examName":null,"collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":null,"name":null,"id":1436716},{"bookId":46092,"source":null,"title":"deal","creationTime":"2026-10-15 15:13:38","stemShoot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261015/07324570d28444b7aac29ea295430e5a.jpg","hasStem":false,"diff":null,"attainedLevel":null,"errorReason":null,"tagNames":[],"exerciseCount":0,"wrongCount":0,"rightCount":0,"topicId":93,"topicName":"其他","examName":null,"collectionIds":[],"isMastered":false,"isRelatedQstGroup":false,"number":null,"name":null,"id":1422773}]},"targetUrl":null,"success":true,"error":null,"unAuthorizedRequest":false,"__abp":true}
+
+请求体里面
+timeType
+0全部
+1 7天
+2 30天
+3 自定义，并有参数开始时间停止时间
+    "attainedLevel": [
+    ],  
+    "diff": [
+    ],  
+    "endTime": "2026-11-14", 
+    "errorReason": [
+    ],  
+    "haveNoTag": false, 
+    "maxResultCount": 20, 
+    "skipCount": 0, 
+    "startTime": "2026-11-14", 
+    "tagIdList": [
+    ],  
+    "timeType": 3, 
+    "topicIds": [
+    ]  
+}  
+
+"topicIds": [
+        4,
+        9,
+        8
+    ]  
+
+先去这里获取所有科目的topicid
+Request
+GET http://sxz.api.zykj.org/api/services/app/MistakeBook/GetMistakeBookFilterOptionsAsync HTTP/1.1
+AppName: Mistake
+AppVersion: 10205
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMwODc1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IjI0d3V5aXh1YW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTdHVkZW50Iiwic3ViIjoiMzA4NzUiLCJqdGkiOiI3ZDVhOGZjNi01ZWRlLTQ1OTctYmI3Ni01MjI1YjVjNzY4M2YiLCJpYXQiOjE3OTQ2MDkyOTIsIm5iZiI6MTc5NDYwOTI5MiwiZXhwIjoxNzk0NjE2NDkyLCJpc3MiOiJFenkiLCJhdWQiOiJTWFoifQ.tn7ytyaEMFvPTdaX2SxrAdlCA1knUGC_cl_TTspxDHM
+Host: sxz.api.zykj.org
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.12.0
+
+
+
+
+--------------------------------------------------------
+
+Response
+HTTP/1.1 200
+Date: Fri, 13 Nov 2026 23:17:29 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 1427
+Connection: keep-alive
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
+Access-Control-Allow-Headers: appname,appversion,content-type,authorization,refreshtoken,clientcode
+Access-Control-Max-Age: 1728000
+Cache-Control: no-cache
+
+{"result":{"topics":[{"bookId":53806,"topicId":4,"topicName":"语文","topicColor":"#2F663D","totalQstCount":7,"sort":1},{"bookId":46077,"topicId":5,"topicName":"数学","topicColor":"#03A9F4","totalQstCount":12,"sort":2},{"bookId":47433,"topicId":6,"topicName":"外语","topicColor":"#FFAA00","totalQstCount":1,"sort":3},{"bookId":54032,"topicId":7,"topicName":"物理","topicColor":"#C874FF","totalQstCount":10,"sort":4},{"bookId":44176,"topicId":8,"topicName":"化学","topicColor":"#FF6200","totalQstCount":31,"sort":5},{"bookId":65708,"topicId":9,"topicName":"生物","topicColor":"#17D938","totalQstCount":1,"sort":6},{"bookId":46144,"topicId":10,"topicName":"政治","topicColor":null,"totalQstCount":3,"sort":7},{"bookId":44360,"topicId":12,"topicName":"地理","topicColor":"#4D5399","totalQstCount":1,"sort":9},{"bookId":46103,"topicId":14,"topicName":"信息技术","topicColor":null,"totalQstCount":0,"sort":11},{"bookId":57436,"topicId":24,"topicName":"体育与健康","topicColor":null,"totalQstCount":3,"sort":13},{"bookId":64088,"topicId":66,"topicName":"调查问卷","topicColor":null,"totalQstCount":1,"sort":31},{"bookId":46092,"topicId":93,"topicName":"其他","topicColor":null,"totalQstCount":2,"sort":39}],"tags":[{"name":"Loshop Wu","bindItemsCount":14,"id":52867},{"name":"发送","bindItemsCount":3,"id":56027}]},"targetUrl":null,"success":true,"error":null,"unAuthorizedRequest":false,"__abp":true}
+只看 "topics": 即可
+
+然后这里是筛选科目，可多选
+
+#对于获取到的错题列表
+"items": [
+            {
+                "bookId": 46092, 
+                "source": null, 
+                "title": "deal", 
+                "creationTime": "2026-10-15 15:13:38", 
+                "stemShoot": "http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261015/07324570d28444b7aac29ea295430e5a.jpg", 
+                "hasStem": false, 
+                "diff": null, 
+                "attainedLevel": null, 
+                "errorReason": null, 
+                "tagNames": [
+                ],  
+                "exerciseCount": 0, 
+                "wrongCount": 0, 
+                "rightCount": 0, 
+                "topicId": 93, 
+                "topicName": "其他", 
+                "examName": null, 
+                "collectionIds": [
+                ],  
+                "isMastered": false, 
+                "isRelatedQstGroup": false, 
+                "number": null, 
+                "name": null, 
+                "id": 1422773 
+         },  
+            {
+                "bookId": 44176, 
+                "source": "正误判断2：物质结构（国庆作业二）", 
+                "title": null, 
+                "creationTime": "2026-10-02 18:45:49", 
+                "stemShoot": "http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261002/f904e86e-f407-4b7c-be1e-7ef656224791/stem.png", 
+                "hasStem": true, 
+                "diff": null, 
+                "attainedLevel": null, 
+                "errorReason": null, 
+                "tagNames": [
+                ],  
+                "exerciseCount": 0, 
+                "wrongCount": 0, 
+                "rightCount": 0, 
+                "topicId": 8, 
+                "topicName": "化学", 
+                "examName": "正误判断2：物质结构（国庆作业二）", 
+                "collectionIds": [
+                ],  
+                "isMastered": false, 
+                "isRelatedQstGroup": false, 
+                "number": "72", 
+                "name": "", 
+                "id": 1414693 
+         },  
+            {
+
+这里"source"如果有，就是现在tb已经写好的错题
+如果null,就属于“自定义错题”，这么获取：
+Request
+GET http://sxz.api.zykj.org/api/services/app/MistakeBook/GetCustomMistakeQstItemDetailInfoAsync?itemId=1439718 HTTP/1.1
+AppName: Mistake
+AppVersion: 10205
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMwODc1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IjI0d3V5aXh1YW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTdHVkZW50Iiwic3ViIjoiMzA4NzUiLCJqdGkiOiI3ZDVhOGZjNi01ZWRlLTQ1OTctYmI3Ni01MjI1YjVjNzY4M2YiLCJpYXQiOjE3OTQ2MDkyOTIsIm5iZiI6MTc5NDYwOTI5MiwiZXhwIjoxNzk0NjE2NDkyLCJpc3MiOiJFenkiLCJhdWQiOiJTWFoifQ.tn7ytyaEMFvPTdaX2SxrAdlCA1knUGC_cl_TTspxDHM
+Host: sxz.api.zykj.org
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.12.0
+
+
+
+
+--------------------------------------------------------
+
+Response
+HTTP/1.1 200
+Date: Fri, 13 Nov 2026 23:21:26 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 1003
+Connection: keep-alive
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
+Access-Control-Allow-Headers: appname,appversion,content-type,authorization,refreshtoken,clientcode
+Access-Control-Max-Age: 1728000
+Cache-Control: no-cache
+
+{"result":{"questionId":0,"examId":null,"number":0,"name":null,"qstFlows":[],"qstPath":"/Question/View/0","attachments":null,"answerInfos":[{"uuid":null,"number":1,"result":0,"originResult":null,"taskState":null,"examAnswers":[],"examComments":[],"examMicroLessonComment":null,"revisingAnswers":[],"reviseMicroLessonComment":null,"revisingComments":[]}],"revisingResult":0,"revisingAnswerd":false,"lastRoundRevisingRecords":[],"microClassToQuestionList":[],"microClassToStudentList":[],"typicalErrorAnswers":null,"typicalRightAnswers":null,"itemType":0,"isShowAnswer":false,"isShowMicroLesson":false,"collectionIds":[],"isInReviewState":false,"itemId":1439718,"bookId":65708,"extraStems":["http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261102/d105f312d53243aeb413130b5073e2cd.jpg"],"diff":null,"attainedLevel":null,"errorReason":null,"mistakeTags":[],"note":null,"draft":null,"pictureNote":null},"targetUrl":null,"success":true,"error":null,"unAuthorizedRequest":false,"__abp":true}
+如果不是自定义，就这么获取（我记得代码已有）
+Request
+GET http://sxz.api.zykj.org/api/services/app/MistakeBook/GetMistakeQstItemDetailInfoAsync?itemId=1414693 HTTP/1.1
+AppName: Mistake
+AppVersion: 10205
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMwODc1IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IjI0d3V5aXh1YW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTdHVkZW50Iiwic3ViIjoiMzA4NzUiLCJqdGkiOiI3ZDVhOGZjNi01ZWRlLTQ1OTctYmI3Ni01MjI1YjVjNzY4M2YiLCJpYXQiOjE3OTQ2MDkyOTIsIm5iZiI6MTc5NDYwOTI5MiwiZXhwIjoxNzk0NjE2NDkyLCJpc3MiOiJFenkiLCJhdWQiOiJTWFoifQ.tn7ytyaEMFvPTdaX2SxrAdlCA1knUGC_cl_TTspxDHM
+Host: sxz.api.zykj.org
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.12.0
+
+
+
+
+--------------------------------------------------------
+
+Response
+HTTP/1.1 200
+Date: Fri, 13 Nov 2026 23:23:50 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 1728
+Connection: keep-alive
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
+Access-Control-Allow-Headers: appname,appversion,content-type,authorization,refreshtoken,clientcode
+Access-Control-Max-Age: 1728000
+Cache-Control: no-cache
+
+{"result":{"questionId":2522056,"examId":448260,"number":72,"name":null,"qstFlows":[{"type":1,"score":5.0,"missType":0,"missScore":0.0,"number":1,"uuid":"49b76122b7be11f1ac2ce198693d0b27","qstType":0,"options":["√","×"],"subQuestions":null,"getScore":0.0,"originScore":null}],"qstPath":"/Question/View/2522056","attachments":"[]","answerInfos":[{"uuid":"49b76122b7be11f1ac2ce198693d0b27","number":1,"result":4,"originResult":null,"taskState":6,"examAnswers":["√"],"examComments":["×"],"examMicroLessonComment":null,"revisingAnswers":["×"],"reviseMicroLessonComment":null,"revisingComments":["×"]}],"revisingResult":2,"revisingAnswerd":true,"lastRoundRevisingRecords":[],"microClassToQuestionList":[{"isPrivate":false,"id":67027,"name":"陈婉亚 2026-09-30 12:47:42","snapshot":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/eval_v2/res/20927/20260930/3a4d762ad2cd43c7a95c48e91bd2334d/3e9d6632-ec63-4a55-a662-d63ce8f0208b_6.jpg","address":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/eval_v2/res/20927/20260930/3a4d762ad2cd43c7a95c48e91bd2334d/3e9d6632-ec63-4a55-a662-d63ce8f0208b_6.zip","creatorUserId":20927,"creationTime":"0001-01-01 00:00:00","creatorUserName":null}],"microClassToStudentList":[],"typicalErrorAnswers":null,"typicalRightAnswers":null,"itemType":3,"isShowAnswer":true,"isShowMicroLesson":true,"collectionIds":[],"isInReviewState":false,"itemId":1414693,"bookId":44176,"extraStems":[],"diff":null,"attainedLevel":null,"errorReason":null,"mistakeTags":[],"note":"http://ezy-sxz.oss-cn-hangzhou.aliyuncs.com/mistake_v2/res/30875/20261011/8a23c3a72654425591776272c76ca77a/fileList.json","draft":null,"pictureNote":null},"targetUrl":null,"success":true,"error":null,"unAuthorizedRequest":false,"__abp":true}

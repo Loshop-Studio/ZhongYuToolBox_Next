@@ -12,6 +12,9 @@ class AppConfig {
   /// 未登录时的兜底 API 地址（登录后会替换为当前学校 server）
   static const String defaultApiBaseUrl = 'http://sxz.api.zykj.org';
 
+  /// 个人信息等 zytbapi 扩展接口网关。
+  static const String workerApiBaseUrl = 'https://worker.loshop.com.cn';
+
   /// 云笔记资源 OSS 前缀
   static const String ossBase =
       'http://friday-note.oss-cn-hangzhou.aliyuncs.com/';

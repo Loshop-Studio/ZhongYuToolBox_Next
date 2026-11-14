@@ -52,6 +52,7 @@ class _AboutPageState extends State<AboutPage> {
       final json = await rootBundle.loadString('assets/changelog.json');
       final data = jsonDecode(json) as Map<String, dynamic>;
       final list = (data['changelog'] as List? ?? <dynamic>[])
+          .take(1)
           .map((e) {
             final m = e as Map<String, dynamic>;
             final version = (m['version'] ?? '').toString();
@@ -59,8 +60,6 @@ class _AboutPageState extends State<AboutPage> {
             return version.isEmpty ? text : '$version $text';
           })
           .where((e) => e.isNotEmpty)
-          .toList()
-          .reversed
           .toList();
       if (mounted) setState(() => _changelog = list);
     } catch (_) {
@@ -82,7 +81,9 @@ class _AboutPageState extends State<AboutPage> {
         return;
       }
       final info = data['electron'];
-      final serverVersion = info is Map ? (info['version'] ?? '').toString() : '';
+      final serverVersion = info is Map
+          ? (info['version'] ?? '').toString()
+          : '';
       if (serverVersion.isEmpty) {
         setState(() => _versionMessage = '已是最新版本');
         return;
@@ -96,15 +97,13 @@ class _AboutPageState extends State<AboutPage> {
         if (mounted) {
           await Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (_) => ForceUpdatePage(
-                info: ForceUpdateInfo(serverVersion, notes),
-              ),
+              builder: (_) =>
+                  ForceUpdatePage(info: ForceUpdateInfo(serverVersion, notes)),
             ),
           );
         }
       } else {
-        setState(() => _versionMessage =
-            '当前为开发/测试版本（服务器 $serverVersion）');
+        setState(() => _versionMessage = '当前为开发/测试版本（服务器 $serverVersion）');
       }
     } catch (_) {
       if (mounted) setState(() => _versionMessage = '检查更新失败，请稍后重试');
@@ -205,8 +204,10 @@ class _AboutPageState extends State<AboutPage> {
               if (_changelog.isNotEmpty) ...[
                 const Padding(
                   padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
-                  child: Text('更新日志',
-                      style: TextStyle(fontWeight: FontWeight.w600)),
+                  child: Text(
+                    '更新日志',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 ),
                 for (final line in _changelog)
                   ListTile(

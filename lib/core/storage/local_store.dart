@@ -14,6 +14,7 @@ class LocalStore {
   static const String keySession = 'zy_session';
   static const String keyLastAccount = 'zy_last_account';
   static const String keyNoteRenderer = 'zy_note_renderer';
+  static const String keyMistakeBookVersion = 'zy_mistakebook_version';
 
   final AppFileStore _files = AppFileStore.instance;
   Map<String, String> _settings = <String, String>{};
