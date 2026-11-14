@@ -6,8 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../core/storage/session_manager.dart';
 import '../../data/api/exam_api.dart';
-import '../../data/models/exam.dart';
-import '../../shared/widgets/common.dart';
 import '../../shared/widgets/user_avatar.dart';
 
 /// 主页：账号、未完成测评、功能入口
@@ -22,8 +20,6 @@ class _HomePageState extends State<HomePage> {
   final SessionManager _session = SessionManager.instance;
   bool _loadingStats = true;
   int _unfinished = 0;
-  int _taskTotal = 0;
-  List<ExamTask> _recent = <ExamTask>[];
 
   @override
   void initState() {
@@ -47,12 +43,9 @@ class _HomePageState extends State<HomePage> {
     try {
       // 「未完成」= 待处理作业（taskListType=1）的总数，不能靠 examState 推断
       final pending = await ExamApi.getTasks(1, taskListType: 1);
-      final all = await ExamApi.getTasks(1, taskListType: 2);
       if (!mounted) return;
       setState(() {
-        _recent = pending.items.take(3).toList();
         _unfinished = pending.total > 0 ? pending.total : pending.items.length;
-        _taskTotal = all.total > 0 ? all.total : all.items.length;
         _loadingStats = false;
       });
     } catch (_) {
@@ -115,6 +108,7 @@ class _HomePageState extends State<HomePage> {
                       icon: const Icon(Icons.swap_horiz),
                       onPressed: () => context.push('/login'),
                     ),
+                    onTap: () => context.push('/profile'),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -231,39 +225,8 @@ class _HomePageState extends State<HomePage> {
                   _loadingStats ? '—' : '$_unfinished',
                   style: Theme.of(context).textTheme.displaySmall,
                 ),
-                const SizedBox(width: 8),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    _taskTotal > 0 ? '项 / 共 $_taskTotal 项测评' : '项待完成',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ),
               ],
             ),
-            const Divider(),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: const Text('可订正客观题'),
-              subtitle: const Text('一键订正功能将在后续版本提供'),
-              trailing: OutlinedButton(
-                onPressed: () => showToast(context, '一键订正功能将在后续版本提供'),
-                child: const Text('一键订正'),
-              ),
-            ),
-            for (final task in _recent)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  task.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => context.push(
-                  '/exam/${task.id}?name=${Uri.encodeComponent(task.name)}',
-                ),
-              ),
           ],
         ),
       ),

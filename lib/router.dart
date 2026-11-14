@@ -6,12 +6,14 @@ import 'features/about/about_page.dart';
 import 'features/assessment/assessment_page.dart';
 import 'features/assessment/exam_detail_page.dart';
 import 'features/assessment/mistake_pages.dart';
+import 'features/assessment/mistake_v2_page.dart';
 import 'features/assessment/question_page.dart';
 import 'features/auth/add_account_page.dart';
 import 'features/auth/login_page.dart';
 import 'features/dev/develop_page.dart';
 import 'features/download/app_downloads_page.dart';
 import 'features/home/home_page.dart';
+import 'features/home/user_profile_page.dart';
 import 'features/home/announcement_detail_page.dart';
 import 'features/home/message_center_page.dart';
 import 'features/home/screenshot_assistant/screenshot_assistant_page.dart';
@@ -155,9 +157,18 @@ final GoRouter appRouter = GoRouter(
           MistakeDetailPage(itemId: state.pathParameters['itemId'] ?? ''),
     ),
     GoRoute(
+      path: '/mistake-v2/item/:itemId',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (_, state) => MistakeV2DetailPage(
+        itemId: state.pathParameters['itemId'] ?? '',
+        custom: state.uri.queryParameters['custom'] == 'true',
+        fallbackStem: state.uri.queryParameters['stem'] ?? '',
+      ),
+    ),
+    GoRoute(
       path: '/mistake',
       parentNavigatorKey: rootNavigatorKey,
-      builder: (_, __) => const MistakeBooksPage(),
+      builder: (_, __) => const MistakeBookEntryPage(),
     ),
     GoRoute(
       path: '/mistake/:bookId',
@@ -200,6 +211,11 @@ final GoRouter appRouter = GoRouter(
       path: '/messages',
       parentNavigatorKey: rootNavigatorKey,
       builder: (_, __) => const MessageCenterPage(),
+    ),
+    GoRoute(
+      path: '/profile',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (_, __) => const UserProfilePage(),
     ),
     GoRoute(
       path: '/announcement',

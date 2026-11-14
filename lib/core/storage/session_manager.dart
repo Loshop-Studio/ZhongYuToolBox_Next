@@ -56,7 +56,9 @@ class SessionManager extends ChangeNotifier {
   Future<void> bootstrap() async {
     await LocalStore.instance.init();
     _loadAccounts(await LocalStore.instance.readSecret(LocalStore.keyAccounts));
-    final rawSession = await LocalStore.instance.readSecret(LocalStore.keySession);
+    final rawSession = await LocalStore.instance.readSecret(
+      LocalStore.keySession,
+    );
     if (rawSession != null && rawSession.isNotEmpty) {
       try {
         session = Session.fromJson(
@@ -67,8 +69,8 @@ class SessionManager extends ChangeNotifier {
       }
     }
     final lastId = LocalStore.instance.getString(LocalStore.keyLastAccount);
-    currentAccount = _findAccount(lastId) ??
-        (accounts.isNotEmpty ? accounts.first : null);
+    currentAccount =
+        _findAccount(lastId) ?? (accounts.isNotEmpty ? accounts.first : null);
     _ready = true;
     startAutoRefresh();
     notifyListeners();
@@ -120,7 +122,9 @@ class SessionManager extends ChangeNotifier {
       skipAuth: true,
       skipRecover: true,
     );
-    final map = data is Map ? Map<String, dynamic>.from(data) : <String, dynamic>{};
+    final map = data is Map
+        ? Map<String, dynamic>.from(data)
+        : <String, dynamic>{};
     final result = DiscoverResult.fromJson(map);
     if (!result.isValid) {
       throw ApiException('学校代码「$trimmed」不存在或该校服务暂不可用');
@@ -170,7 +174,9 @@ class SessionManager extends ChangeNotifier {
       session
         ..clear()
         ..apiBaseUrl = server
-        ..webServer = discover.webServer.isNotEmpty ? discover.webServer : webServer
+        ..webServer = discover.webServer.isNotEmpty
+            ? discover.webServer
+            : webServer
         ..schoolCode = schoolCode
         ..schoolName = schoolName
         ..userName = account;
@@ -212,7 +218,10 @@ class SessionManager extends ChangeNotifier {
 
       await _persistAccounts();
       await _persistSession();
-      await LocalStore.instance.setString(LocalStore.keyLastAccount, newAccount.id);
+      await LocalStore.instance.setString(
+        LocalStore.keyLastAccount,
+        newAccount.id,
+      );
 
       // 登录上报 + 封禁检查（每天最多一次；上报失败不影响主流程）
       await _reportLoginDaily();
@@ -244,7 +253,8 @@ class SessionManager extends ChangeNotifier {
         account.userName,
       );
       if (ban.banned) {
-        _blockMessage = '${ban.message ?? '该账号已被管理员封禁'}'
+        _blockMessage =
+            '${ban.message ?? '该账号已被管理员封禁'}'
             '\n\n如确认有误，请加 QQ 群 ${AppConfig.supportQqGroup}';
       }
       await LocalStore.instance.setString(_kLastLoginReport, today);
@@ -265,7 +275,8 @@ class SessionManager extends ChangeNotifier {
     required String fallback,
   }) {
     final lower = discoverName.toLowerCase();
-    final meaningful = discoverName.isNotEmpty &&
+    final meaningful =
+        discoverName.isNotEmpty &&
         lower != 'unknown' &&
         lower != code.toLowerCase();
     if (meaningful) return discoverName;
@@ -280,12 +291,15 @@ class SessionManager extends ChangeNotifier {
       skipRecover: true,
     );
     final result = data is Map ? data['result'] : null;
-    return result is Map ? Map<String, dynamic>.from(result) : <String, dynamic>{};
+    return result is Map
+        ? Map<String, dynamic>.from(result)
+        : <String, dynamic>{};
   }
 
   void _applyToken(Map<String, dynamic> result) {
     final expire = (result['expireInSeconds'] as num?)?.toInt() ?? 0;
-    final refreshExpire = (result['refreshExpireInSeconds'] as num?)?.toInt() ?? 0;
+    final refreshExpire =
+        (result['refreshExpireInSeconds'] as num?)?.toInt() ?? 0;
     session
       ..token = (result['accessToken'] ?? '').toString()
       ..refreshToken = (result['refreshToken'] ?? '').toString()
@@ -325,12 +339,22 @@ class SessionManager extends ChangeNotifier {
     return autoLogin();
   }
 
-  Future<Account?> editAccount(Account account, {String? realName}) async {
+  Future<Account?> editAccount(
+    Account account, {
+    String? realName,
+    String? photo,
+  }) async {
     final index = accounts.indexWhere((e) => e.id == account.id);
     if (index < 0) return null;
-    final updated = accounts[index].copyWith(realName: realName);
+    final updated = accounts[index].copyWith(realName: realName, photo: photo);
     accounts[index] = updated;
     if (currentAccount?.id == updated.id) currentAccount = updated;
+    if (currentAccount?.id == updated.id) {
+      session
+        ..realName = realName ?? session.realName
+        ..photo = photo ?? session.photo;
+      await _persistSession();
+    }
     await _persistAccounts();
     notifyListeners();
     return updated;

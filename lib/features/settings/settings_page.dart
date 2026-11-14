@@ -24,6 +24,34 @@ class _SettingsPageState extends State<SettingsPage> {
   String? _switchingId;
   bool _clearingImageCache = false;
 
+  String get _mistakeBookVersion =>
+      LocalStore.instance.getString(LocalStore.keyMistakeBookVersion) ?? '';
+
+  Future<void> _chooseMistakeBookVersion() async {
+    await LocalStore.instance.init();
+    if (!mounted) return;
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('错题本版本'),
+        content: SegmentedButton<String>(
+          segments: const [
+            ButtonSegment(value: 'v2', label: Text('新版')),
+            ButtonSegment(value: 'v1', label: Text('旧版')),
+          ],
+          selected: {_mistakeBookVersion == 'v1' ? 'v1' : 'v2'},
+          onSelectionChanged: (value) => Navigator.pop(context, value.first),
+        ),
+      ),
+    );
+    if (selected == null) return;
+    await LocalStore.instance.setString(
+      LocalStore.keyMistakeBookVersion,
+      selected,
+    );
+    if (mounted) setState(() {});
+  }
+
   static const List<Color> _presets = [
     ThemePrefs.defaultBlue,
     Color(0xFFC62828),
@@ -86,8 +114,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ],
             selected: {theme.mode},
-            onSelectionChanged: (selected) =>
-                theme.setMode(selected.first),
+            onSelectionChanged: (selected) => theme.setMode(selected.first),
           ),
         ),
         if (theme.mode == ThemeColorMode.custom) ...[
@@ -106,8 +133,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 _ColorSwatch(
                   color: theme.customColor,
                   custom: true,
-                  selected: !_presets
-                      .any((c) => c.toARGB32() == theme.customColor.toARGB32()),
+                  selected: !_presets.any(
+                    (c) => c.toARGB32() == theme.customColor.toARGB32(),
+                  ),
                   onTap: _pickCustomColor,
                 ),
               ],
@@ -248,6 +276,20 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
               const Divider(),
               _buildThemeSection(),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.menu_book_outlined),
+                title: const Text('错题本版本'),
+                subtitle: Text(
+                  _mistakeBookVersion == 'v1'
+                      ? '当前使用旧版错题本'
+                      : _mistakeBookVersion == 'v2'
+                      ? '当前使用新版错题本'
+                      : '首次打开时选择',
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: _chooseMistakeBookVersion,
+              ),
               const Divider(),
               ListTile(
                 leading: const Icon(Icons.delete_sweep_outlined),
