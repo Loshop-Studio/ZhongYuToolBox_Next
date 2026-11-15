@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/network/api_exception.dart';
+import '../../core/plugins/plugin_models.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../data/api/exam_api.dart';
 import '../../data/models/exam.dart';
 import '../../shared/widgets/common.dart';
+import '../../shared/widgets/plugin_actions.dart';
 
 /// 测评 tab：新测评列表（已完成作业 / 待处理作业 / 全部作业）
 class AssessmentPage extends StatefulWidget {
@@ -194,10 +196,17 @@ class _AssessmentPageState extends State<AssessmentPage>
       appBar: AppBar(
         title: const Text('测评'),
         actions: [
-          TextButton.icon(
-            onPressed: () => context.push('/mistake'),
-            icon: const Icon(Icons.menu_book_outlined, size: 18),
-            label: const Text('错题本'),
+          MergedPluginActionButton(
+            posId: PluginPositions.exerciseHome,
+            pageContext: {
+              'posId': PluginPositions.exerciseHome,
+              'listType': _listType,
+              'tabIndex': _tabController.index,
+              'tabName': _tabs[_tabController.index].label,
+            },
+            nativeLabel: '错题本',
+            nativeIcon: Icons.menu_book_outlined,
+            onNative: () => context.push('/mistake'),
           ),
           const SizedBox(width: 8),
         ],

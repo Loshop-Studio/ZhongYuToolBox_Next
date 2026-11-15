@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/config/app_config.dart';
+import 'core/plugins/plugin_manager.dart';
 import 'core/storage/session_manager.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_prefs.dart';
@@ -49,6 +50,7 @@ class _ZhongYuAppState extends State<ZhongYuApp> {
     final session = SessionManager.instance;
     await session.bootstrap();
     await ThemePrefs.instance.init();
+    await PluginManager.instance.init();
 
     // 启动强制更新检测：仅用 electron 渠道（Flutter 端共用）。
     // 接口不返回下载链接，仅用于判断是否需要强制升级。

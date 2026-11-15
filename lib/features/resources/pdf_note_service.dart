@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
@@ -84,11 +83,20 @@ class PdfNoteService {
     return Uint8List.fromList(latin1.encode(updated));
   }
 
+  /// 描述模板是文本格式，但扩展名为 .bin。部分 Windows Git 配置会把其中的
+  /// LF 自动转换为 CRLF，导致它的摘要与 router.bin 内记录的摘要不一致。
+  static Uint8List _normalizeTemplateLineEndings(Uint8List bytes) {
+    final text = latin1.decode(bytes);
+    final normalized = text.replaceAll('\r\n', '\n');
+    if (normalized == text) return bytes;
+    return Uint8List.fromList(latin1.encode(normalized));
+  }
+
   static Map<String, Uint8List> _preparePageTemplates(
     Map<String, Uint8List> templates,
     Uint8List image,
   ) {
-    final original = templates[_descriptor]!;
+    final original = _normalizeTemplateLineEndings(templates[_descriptor]!);
     final originalHash = _sha256Hex(original);
     final descriptor = _replaceDigest(original, _sha256Hex(image));
     final router = _replaceDigest(

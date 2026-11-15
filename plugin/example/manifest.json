@@ -1,0 +1,26 @@
+{
+  "id": "com.zhongyu.toolbox.example.username",
+  "name": "获取用户名示例",
+  "version": "1.0.0",
+  "author": "ZhongYuToolBox",
+  "description": "调用 User/GetInfoAsync 获取当前登录账号的用户名。",
+  "bytecode": "plugin.evc",
+  "pages": [
+    {
+      "id": "home",
+      "title": "获取用户名",
+      "library": "package:zytb_username_example/main.dart",
+      "function": "buildUsernamePage"
+    }
+  ],
+  "actions": [
+    {
+      "id": "get-username",
+      "posId": "Homepage:Menu",
+      "label": "获取用户名",
+      "icon": "person",
+      "pageId": "home",
+      "order": 10
+    }
+  ]
+}

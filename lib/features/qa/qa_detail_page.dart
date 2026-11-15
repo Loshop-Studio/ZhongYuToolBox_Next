@@ -3,12 +3,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/network/api_exception.dart';
+import '../../core/plugins/plugin_models.dart';
 import '../../core/storage/image_cache_manager.dart';
 import '../../core/util/formatters.dart';
 import '../../core/util/urls.dart';
 import '../../data/api/quora_api.dart';
 import '../../data/models/quora.dart';
 import '../../shared/widgets/common.dart';
+import '../../shared/widgets/plugin_actions.dart';
 import '../../shared/widgets/user_avatar.dart';
 
 /// 问答详情：左侧消息列表 + 右侧内容 + 右下角回复按钮
@@ -100,6 +102,34 @@ class _QaDetailPageState extends State<QaDetailPage> {
             tooltip: '刷新',
             icon: const Icon(Icons.refresh),
             onPressed: _load,
+          ),
+          PluginActionButton(
+            posId: PluginPositions.askDetail,
+            pageContext: {
+              'posId': PluginPositions.askDetail,
+              'sessionId': widget.sessionId,
+              'askUserPhoto': widget.askUserPhoto,
+              'selectedIndex': _selectedIndex,
+              'messageCount': _messages.length,
+              'messages': [
+                for (final message in _messages)
+                  {
+                    'id': message.id,
+                    'userName': message.userName,
+                    'userPhoto': message.userPhoto,
+                    'sendTime': message.sendTime,
+                    'snapshot': message.snapshot,
+                    'content': message.content,
+                    'isPrimary': message.isPrimary,
+                  },
+              ],
+              if (_messages.isNotEmpty) ...{
+                'messageId': _messages[_selectedIndex].id,
+                'messageUserName': _messages[_selectedIndex].userName,
+                'messageContent': _messages[_selectedIndex].content,
+                'messageSendTime': _messages[_selectedIndex].sendTime,
+              },
+            },
           ),
           const SizedBox(width: 4),
         ],

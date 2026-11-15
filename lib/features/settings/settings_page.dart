@@ -292,6 +292,14 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               const Divider(),
               ListTile(
+                leading: const Icon(Icons.extension_outlined),
+                title: const Text('插件'),
+                subtitle: const Text('导入、启用或卸载高权限插件'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/plugins'),
+              ),
+              const Divider(),
+              ListTile(
                 leading: const Icon(Icons.delete_sweep_outlined),
                 title: const Text('清除图片缓存'),
                 subtitle: const Text('图库、领创图标和随身答图片'),

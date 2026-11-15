@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/responsive/breakpoints.dart';
+import '../../core/plugins/plugin_manager.dart';
+import '../../core/plugins/plugin_models.dart';
 import '../../core/storage/session_manager.dart';
 import '../../data/api/exam_api.dart';
 import '../../shared/widgets/user_avatar.dart';
+import '../../shared/widgets/plugin_actions.dart';
 
 /// 主页：账号、未完成测评、功能入口
 class HomePage extends StatefulWidget {
@@ -108,7 +111,19 @@ class _HomePageState extends State<HomePage> {
                       icon: const Icon(Icons.swap_horiz),
                       onPressed: () => context.push('/login'),
                     ),
-                    onTap: () => context.push('/profile'),
+                    onTap: () => showNativeAndPluginActions(
+                      context,
+                      posId: PluginPositions.homepageUserCard,
+                      pageContext: {
+                        'route': '/home',
+                        'username': _session.session.userName,
+                        'displayName': _session.displayName,
+                        'userId': _session.session.userId,
+                      },
+                      nativeLabel: '个人信息',
+                      nativeIcon: Icons.person_outline,
+                      onNative: () => context.push('/profile'),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -122,70 +137,84 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                _EntryGrid(
-                  entries: [
-                    _Entry(
-                      '云笔记',
-                      Icons.description_outlined,
-                      () => context.go('/resources'),
-                    ),
-                    _Entry(
-                      '图库',
-                      Icons.photo_library_outlined,
-                      () => context.go('/resources?tab=gallery'),
-                    ),
-                    _Entry(
-                      '随身答',
-                      Icons.forum_outlined,
-                      () => context.go('/qa'),
-                    ),
-                    _Entry(
-                      '优客畅学',
-                      Icons.menu_book_outlined,
-                      () => context.go('/study'),
-                    ),
-                    _Entry(
-                      '错题本',
-                      Icons.fact_check_outlined,
-                      () => context.push('/mistake'),
-                    ),
-                    _Entry(
-                      '选课',
-                      Icons.school_outlined,
-                      () => context.push('/course'),
-                    ),
-                    _Entry(
-                      '中育应用下载',
-                      Icons.download_outlined,
-                      () => context.push('/downloads'),
-                    ),
-                    _Entry(
-                      '领创',
-                      Icons.cast_for_education_outlined,
-                      () => context.push('/linspirer'),
-                    ),
-                    if (Platform.isWindows)
+                ListenableBuilder(
+                  listenable: PluginManager.instance,
+                  builder: (context, _) => _EntryGrid(
+                    entries: [
                       _Entry(
-                        '笔记截图助手',
-                        Icons.screenshot_monitor_outlined,
-                        () => context.push('/screenshot-assistant'),
+                        '云笔记',
+                        Icons.description_outlined,
+                        () => context.go('/resources'),
                       ),
-                    _Entry(
-                      '开发工具',
-                      Icons.build_outlined,
-                      () => context.push('/dev'),
-                    ),
-                    _Entry(
-                      '关于与支持',
-                      Icons.info_outline,
-                      () => context.push('/about'),
-                    ),
-                    _Entry(
-                      '设置',
-                      Icons.settings_outlined,
-                      () => context.push('/settings'),
-                    ),
-                  ],
+                      _Entry(
+                        '图库',
+                        Icons.photo_library_outlined,
+                        () => context.go('/resources?tab=gallery'),
+                      ),
+                      _Entry(
+                        '随身答',
+                        Icons.forum_outlined,
+                        () => context.go('/qa'),
+                      ),
+                      _Entry(
+                        '优客畅学',
+                        Icons.menu_book_outlined,
+                        () => context.go('/study'),
+                      ),
+                      _Entry(
+                        '错题本',
+                        Icons.fact_check_outlined,
+                        () => context.push('/mistake'),
+                      ),
+                      _Entry(
+                        '选课',
+                        Icons.school_outlined,
+                        () => context.push('/course'),
+                      ),
+                      _Entry(
+                        '中育应用下载',
+                        Icons.download_outlined,
+                        () => context.push('/downloads'),
+                      ),
+                      _Entry(
+                        '领创',
+                        Icons.cast_for_education_outlined,
+                        () => context.push('/linspirer'),
+                      ),
+                      if (Platform.isWindows)
+                        _Entry(
+                          '笔记截图助手',
+                          Icons.screenshot_monitor_outlined,
+                          () => context.push('/screenshot-assistant'),
+                        ),
+                      _Entry(
+                        '开发工具',
+                        Icons.build_outlined,
+                        () => context.push('/dev'),
+                      ),
+                      _Entry(
+                        '关于与支持',
+                        Icons.info_outline,
+                        () => context.push('/about'),
+                      ),
+                      _Entry(
+                        '设置',
+                        Icons.settings_outlined,
+                        () => context.push('/settings'),
+                      ),
+                      for (final action in PluginManager.instance.actionsFor(
+                        PluginPositions.homepageMenu,
+                      ))
+                        _Entry(
+                          action.action.label,
+                          pluginIcon(action.action.icon),
+                          () => openPluginAction(context, action, {
+                            'route': '/home',
+                            'posId': PluginPositions.homepageMenu,
+                          }),
+                        ),
+                    ],
+                  ),
                 ),
               ],
             ),

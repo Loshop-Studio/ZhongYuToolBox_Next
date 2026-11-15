@@ -2,11 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/network/api_exception.dart';
+import '../../core/plugins/plugin_models.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/util/file_saver.dart';
 import '../../data/api/note_api.dart';
 import '../../shared/widgets/common.dart';
+import '../../shared/widgets/plugin_actions.dart';
 import 'note_export_service.dart';
 import 'note_renderer.dart';
 
@@ -29,12 +31,27 @@ class NoteDetailPage extends StatelessWidget {
           fileName.isEmpty ? '笔记预览' : fileName,
           overflow: TextOverflow.ellipsis,
         ),
+        actions: [
+          PluginActionButton(
+            posId: PluginPositions.noteDetail,
+            pageContext: {
+              'posId': PluginPositions.noteDetail,
+              'fileId': fileId,
+              'fileName': fileName,
+            },
+          ),
+          const SizedBox(width: 4),
+        ],
       ),
       body: Align(
         alignment: Alignment.topCenter,
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1100),
-          child: NoteDetailBody(fileId: fileId, fileName: fileName),
+          child: NoteDetailBody(
+            fileId: fileId,
+            fileName: fileName,
+            showPluginAction: false,
+          ),
         ),
       ),
     );
@@ -47,10 +64,12 @@ class NoteDetailBody extends StatefulWidget {
     super.key,
     required this.fileId,
     required this.fileName,
+    this.showPluginAction = true,
   });
 
   final String fileId;
   final String fileName;
+  final bool showPluginAction;
 
   @override
   State<NoteDetailBody> createState() => _NoteDetailBodyState();
@@ -152,6 +171,17 @@ class _NoteDetailBodyState extends State<NoteDetailBody> {
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const Spacer(),
+          if (widget.showPluginAction)
+            PluginActionButton(
+              posId: PluginPositions.noteDetail,
+              pageContext: {
+                'posId': PluginPositions.noteDetail,
+                'fileId': widget.fileId,
+                'fileName': widget.fileName,
+                'pageCount': _pages.length,
+                'pageIndex': _index,
+              },
+            ),
           TextButton.icon(
             onPressed: _busy == null ? _exportPdf : null,
             icon: _busy == 'pdf'

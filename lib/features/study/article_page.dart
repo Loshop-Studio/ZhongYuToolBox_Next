@@ -7,18 +7,27 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/config/app_config.dart';
+import '../../core/plugins/plugin_models.dart';
 import '../../core/storage/session_manager.dart';
 import '../../core/web/app_webview_environment.dart';
 import '../../core/web/js_bridge.dart';
 import '../../shared/widgets/common.dart';
+import '../../shared/widgets/plugin_actions.dart';
 import 'attachment_opener.dart';
 
 /// 在线专栏文章：直接加载官方 Web 页面
 /// `{webHost}/navPage.html?apiHost=...&apiToken=...`#/ArticlePage?id=xxx
 class ArticlePage extends StatefulWidget {
-  const ArticlePage({super.key, required this.pageId});
+  const ArticlePage({
+    super.key,
+    required this.pageId,
+    this.colId = 0,
+    this.colName = '',
+  });
 
   final int pageId;
+  final int colId;
+  final String colName;
 
   @override
   State<ArticlePage> createState() => _ArticlePageState();
@@ -75,6 +84,16 @@ class _ArticlePageState extends State<ArticlePage> {
               if (!opened && mounted) {
                 showToast(context, '无法打开链接，请检查默认浏览器设置');
               }
+            },
+          ),
+          PluginActionButton(
+            posId: PluginPositions.columnDetail,
+            pageContext: {
+              'posId': PluginPositions.columnDetail,
+              'pageId': widget.pageId,
+              'columnId': widget.colId,
+              'columnName': widget.colName,
+              'url': _entryUrl,
             },
           ),
           const SizedBox(width: 4),

@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/network/api_exception.dart';
+import '../../core/plugins/plugin_models.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../core/storage/image_cache_manager.dart';
 import '../../core/util/formatters.dart';
@@ -14,6 +15,7 @@ import '../../data/api/picture_api.dart';
 import '../../data/models/picture.dart';
 import '../../shared/widgets/app_actions.dart';
 import '../../shared/widgets/common.dart';
+import '../../shared/widgets/plugin_actions.dart';
 import 'picture_detail_page.dart';
 
 /// 图库（网格 + 大图查看）
@@ -176,7 +178,20 @@ class GalleryTabState extends State<GalleryTab>
       right: 16,
       bottom: 16,
       child: FloatingActionButton(
-        onPressed: _uploading ? null : _upload,
+        onPressed: _uploading
+            ? null
+            : () => showNativeAndPluginActions(
+                context,
+                posId: PluginPositions.galleryAdd,
+                pageContext: {
+                  'posId': PluginPositions.galleryAdd,
+                  'recycle': widget.recycle,
+                  'pictureCount': _items.length,
+                },
+                nativeLabel: '上传图片',
+                nativeIcon: Icons.add_photo_alternate_outlined,
+                onNative: _upload,
+              ),
         tooltip: '上传图片',
         child: _uploading
             ? const SizedBox.square(

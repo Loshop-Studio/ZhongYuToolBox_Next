@@ -2,8 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/network/api_exception.dart';
+import '../../core/plugins/plugin_models.dart';
 import '../../core/util/urls.dart';
 import '../../shared/widgets/common.dart';
+import '../../shared/widgets/plugin_actions.dart';
 import 'attachment_opener.dart';
 import 'pdf_viewer_page.dart';
 import 'video_player_page.dart';
@@ -89,6 +91,16 @@ class _LessonViewerPageState extends State<LessonViewerPage> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.download_outlined),
+          ),
+          PluginActionButton(
+            posId: PluginPositions.columnAttachmentDetail,
+            pageContext: {
+              'posId': PluginPositions.columnAttachmentDetail,
+              'kind': widget.kind,
+              'url': widget.url,
+              'displayUrl': _displayUrl,
+              'name': widget.name,
+            },
           ),
           const SizedBox(width: 4),
         ],

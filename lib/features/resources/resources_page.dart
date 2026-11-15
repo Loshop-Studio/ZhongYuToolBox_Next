@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/network/api_exception.dart';
+import '../../core/plugins/plugin_manager.dart';
+import '../../core/plugins/plugin_models.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/util/formatters.dart';
@@ -10,6 +12,7 @@ import '../../data/models/note.dart';
 import '../../shared/widgets/app_actions.dart';
 import '../../shared/widgets/common.dart';
 import '../../shared/widgets/fab_menu.dart';
+import '../../shared/widgets/plugin_actions.dart';
 import 'gallery_page.dart';
 import 'note_detail_page.dart';
 
@@ -523,33 +526,49 @@ class _NoteBrowserState extends State<NoteBrowser> {
           ],
         ),
         Positioned.fill(
-          child: FabMenu(
-            tooltip: '新建',
-            items: [
-              FabMenuItem(
-                icon: Icons.note_add_outlined,
-                label: '新建笔记',
-                onSelected: () => showToast(context, '新建笔记功能尚未完成'),
-              ),
-              FabMenuItem(
-                icon: Icons.create_new_folder_outlined,
-                label: '新建文件夹',
-                onSelected: () => showToast(context, '新建文件夹功能尚未完成'),
-              ),
-              FabMenuItem(
-                icon: Icons.upload_file_outlined,
-                label: '导入 PDF',
-                onSelected: () async {
-                  final parentId = _allMode ? '0' : _currentFolderId;
-                  final parentName = _allMode ? '根目录' : _crumbs.last.name;
-                  final ok = await context.push<bool>(
-                    '/pdf-import?parentId=${Uri.encodeComponent(parentId)}'
-                    '&name=${Uri.encodeComponent(parentName)}',
-                  );
-                  if (ok == true && mounted) _load();
-                },
-              ),
-            ],
+          child: ListenableBuilder(
+            listenable: PluginManager.instance,
+            builder: (context, _) => FabMenu(
+              tooltip: '新建',
+              items: [
+                FabMenuItem(
+                  icon: Icons.note_add_outlined,
+                  label: '新建笔记',
+                  onSelected: () => showToast(context, '新建笔记功能尚未完成'),
+                ),
+                FabMenuItem(
+                  icon: Icons.create_new_folder_outlined,
+                  label: '新建文件夹',
+                  onSelected: () => showToast(context, '新建文件夹功能尚未完成'),
+                ),
+                FabMenuItem(
+                  icon: Icons.upload_file_outlined,
+                  label: '导入 PDF',
+                  onSelected: () async {
+                    final parentId = _allMode ? '0' : _currentFolderId;
+                    final parentName = _allMode ? '根目录' : _crumbs.last.name;
+                    final ok = await context.push<bool>(
+                      '/pdf-import?parentId=${Uri.encodeComponent(parentId)}'
+                      '&name=${Uri.encodeComponent(parentName)}',
+                    );
+                    if (ok == true && mounted) _load();
+                  },
+                ),
+                for (final action in PluginManager.instance.actionsFor(
+                  PluginPositions.notePlusBtn,
+                ))
+                  FabMenuItem(
+                    icon: pluginIcon(action.action.icon),
+                    label: action.action.label,
+                    onSelected: () => openPluginAction(context, action, {
+                      'posId': PluginPositions.notePlusBtn,
+                      'folderId': _allMode ? '0' : _currentFolderId,
+                      'folderName': _allMode ? '根目录' : _crumbs.last.name,
+                      'allMode': _allMode,
+                    }),
+                  ),
+              ],
+            ),
           ),
         ),
       ],

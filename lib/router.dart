@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/storage/session_manager.dart';
+import 'core/plugins/plugin_runtime_page.dart';
 import 'features/about/about_page.dart';
 import 'features/assessment/assessment_page.dart';
 import 'features/assessment/exam_detail_page.dart';
@@ -24,6 +25,7 @@ import 'features/resources/pdf_import_page.dart';
 import 'features/resources/note_detail_page.dart';
 import 'features/resources/resources_page.dart';
 import 'features/settings/settings_page.dart';
+import 'features/settings/plugin_manager_page.dart';
 import 'features/shell/app_shell.dart';
 import 'features/study/article_page.dart';
 import 'features/study/article_comments_page.dart';
@@ -204,8 +206,11 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/article/:pageId',
       parentNavigatorKey: rootNavigatorKey,
-      builder: (_, state) =>
-          ArticlePage(pageId: _intParam(state.pathParameters['pageId'])),
+      builder: (_, state) => ArticlePage(
+        pageId: _intParam(state.pathParameters['pageId']),
+        colId: _intParam(state.uri.queryParameters['colId']),
+        colName: state.uri.queryParameters['colName'] ?? '',
+      ),
     ),
     GoRoute(
       path: '/messages',
@@ -311,6 +316,22 @@ final GoRouter appRouter = GoRouter(
       path: '/settings',
       parentNavigatorKey: rootNavigatorKey,
       builder: (_, __) => const SettingsPage(),
+    ),
+    GoRoute(
+      path: '/plugins',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (_, __) => const PluginManagerPage(),
+    ),
+    GoRoute(
+      path: '/plugin/:pluginId/:pageId',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (_, state) => PluginRuntimePage(
+        pluginId: state.pathParameters['pluginId'] ?? '',
+        pageId: state.pathParameters['pageId'] ?? '',
+        pageContext: state.extra is Map
+            ? Map<String, dynamic>.from(state.extra! as Map)
+            : const <String, dynamic>{},
+      ),
     ),
     GoRoute(
       path: '/downloads',
