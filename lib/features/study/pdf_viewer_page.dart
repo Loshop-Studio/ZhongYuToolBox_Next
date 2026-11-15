@@ -8,8 +8,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdfx/pdfx.dart';
 
 import '../../core/network/api_exception.dart';
+import '../../core/plugins/plugin_models.dart';
 import '../../core/util/urls.dart';
 import '../../shared/widgets/common.dart';
+import '../../shared/widgets/plugin_actions.dart';
 import 'attachment_opener.dart';
 
 /// 原生 PDF 预览：下载到本地缓存后用 PDFium（pdfx）在 Flutter 里绘制。
@@ -216,7 +218,8 @@ class _PdfDocumentViewState extends State<PdfDocumentView> {
   void _onPointerSignal(PointerSignalEvent event) {
     if (event is! PointerScrollEvent) return;
     final keys = HardwareKeyboard.instance.logicalKeysPressed;
-    final controlPressed = keys.contains(LogicalKeyboardKey.controlLeft) ||
+    final controlPressed =
+        keys.contains(LogicalKeyboardKey.controlLeft) ||
         keys.contains(LogicalKeyboardKey.controlRight);
     if (!controlPressed || event.scrollDelta.dy == 0) return;
     _zoomBy(event.scrollDelta.dy < 0 ? 1.15 : 1 / 1.15);
@@ -478,6 +481,16 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.download_outlined),
+          ),
+          PluginActionButton(
+            posId: PluginPositions.columnAttachmentDetail,
+            pageContext: {
+              'posId': PluginPositions.columnAttachmentDetail,
+              'kind': 'pdf',
+              'url': widget.url,
+              'displayUrl': imageDisplayUrl(absoluteOssUrl(widget.url)),
+              'name': widget.name,
+            },
           ),
           const SizedBox(width: 4),
         ],

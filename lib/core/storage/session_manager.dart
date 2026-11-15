@@ -398,6 +398,14 @@ class SessionManager extends ChangeNotifier {
     return false;
   }
 
+  /// 插件打开页面前调用：确保交给插件的是当前最新且有效的 token。
+  Future<bool> ensureValidSession() async {
+    if (session.isTokenValid && !session.shouldRefresh) return true;
+    if (session.canRefresh && await refreshSession()) return true;
+    if (currentAccount != null) return autoLogin();
+    return session.isTokenValid;
+  }
+
   /// 401 恢复：先刷新，再自动重登（并发只执行一次）
   Future<bool> recoverSession() async {
     final running = _recovering;

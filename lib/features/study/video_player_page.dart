@@ -4,7 +4,10 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:media_kit_video/media_kit_video_controls/media_kit_video_controls.dart';
 
 import '../../core/network/api_exception.dart';
+import '../../core/plugins/plugin_models.dart';
+import '../../core/util/urls.dart';
 import '../../shared/widgets/common.dart';
+import '../../shared/widgets/plugin_actions.dart';
 import 'attachment_opener.dart';
 
 /// 原生视频播放（media_kit / libmpv，覆盖 Windows、Android、macOS、Linux）
@@ -140,6 +143,16 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.download_outlined),
+          ),
+          PluginActionButton(
+            posId: PluginPositions.columnAttachmentDetail,
+            pageContext: {
+              'posId': PluginPositions.columnAttachmentDetail,
+              'kind': 'video',
+              'url': widget.url,
+              'displayUrl': imageDisplayUrl(absoluteOssUrl(widget.url)),
+              'name': widget.name,
+            },
           ),
           const SizedBox(width: 4),
         ],

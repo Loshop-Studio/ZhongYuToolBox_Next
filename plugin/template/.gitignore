@@ -1,0 +1,5 @@
+.dart_tool/
+.dart_eval/
+build/
+dist/
+pubspec.lock

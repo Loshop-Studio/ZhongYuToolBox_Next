@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/network/api_exception.dart';
+import '../../core/plugins/plugin_models.dart';
 import '../../core/storage/image_cache_manager.dart';
 import '../../core/util/file_saver.dart';
 import '../../core/util/formatters.dart';
 import '../../data/api/picture_api.dart';
 import '../../data/models/picture.dart';
 import '../../shared/widgets/common.dart';
+import '../../shared/widgets/plugin_actions.dart';
 import 'gallery_page.dart';
 
 /// 图片详情（复刻 PictureDetailView：大图 + 打开原图 + 下载 + 回收站）
@@ -181,8 +183,10 @@ class _PictureDetailPageState extends State<PictureDetailPage> {
   String? _extFromUrl(String url) {
     final segments = Uri.tryParse(url)?.pathSegments ?? const <String>[];
     if (segments.isEmpty) return null;
-    final match = RegExp(r'\.([a-z0-9]+)$', caseSensitive: false)
-        .firstMatch(segments.last);
+    final match = RegExp(
+      r'\.([a-z0-9]+)$',
+      caseSensitive: false,
+    ).firstMatch(segments.last);
     return match?.group(1)?.toLowerCase();
   }
 
@@ -220,6 +224,21 @@ class _PictureDetailPageState extends State<PictureDetailPage> {
             tooltip: widget.recycle ? '彻底删除' : '移入回收站',
             onPressed: _remove,
             icon: const Icon(Icons.delete_outline),
+          ),
+          PluginActionButton(
+            posId: PluginPositions.galleryDetail,
+            pageContext: {
+              'posId': PluginPositions.galleryDetail,
+              'id': _item.id,
+              'picture': _item.picture,
+              'url': _url,
+              'name': _item.name,
+              'size': _item.size,
+              'createTime': _item.createTime,
+              'index': _index,
+              'total': widget.items.length,
+              'recycle': widget.recycle,
+            },
           ),
           const SizedBox(width: 4),
         ],

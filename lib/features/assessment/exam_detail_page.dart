@@ -8,6 +8,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/network/api_exception.dart';
+import '../../core/plugins/plugin_models.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../core/storage/session_manager.dart';
 import '../../core/util/file_saver.dart';
@@ -17,6 +18,7 @@ import '../../data/api/exam_mistake_api.dart';
 import '../../data/models/exam.dart';
 import '../../shared/widgets/common.dart';
 import '../../shared/widgets/html_capture.dart';
+import '../../shared/widgets/plugin_actions.dart';
 import 'exam_review_store.dart';
 import 'exam_sync_service.dart';
 
@@ -342,6 +344,19 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
               icon: const Icon(Icons.download_outlined),
             ),
           ],
+          PluginActionButton(
+            posId: PluginPositions.exerciseDetail,
+            pageContext: {
+              'posId': PluginPositions.exerciseDetail,
+              'taskId': widget.taskId,
+              'name': widget.name,
+              'view': _view,
+              'wrongCount': _wrongCount,
+              'task': _task,
+              'questionCount': _questions.length,
+              'questions': [for (final question in _questions) question.raw],
+            },
+          ),
           const SizedBox(width: 4),
         ],
       ),

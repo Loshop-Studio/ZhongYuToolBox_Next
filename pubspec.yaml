@@ -38,6 +38,8 @@ dependencies:
   win32_registry: ^1.1.5
   dynamic_color: 1.7.0
   flutter_colorpicker: ^1.1.0
+  flutter_eval: 0.8.2
+  dart_eval: 0.8.5
 
 dev_dependencies:
   flutter_test:

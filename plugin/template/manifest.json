@@ -1,0 +1,40 @@
+{
+  "id": "com.example.zytb_plugin_template",
+  "name": "Toolbox 插件模板",
+  "version": "1.0.0",
+  "author": "Your Name",
+  "description": "展示多页面、最新会话、HTTP 与本地文件能力。",
+  "bytecode": "plugin.evc",
+  "pages": [
+    {
+      "id": "home",
+      "title": "插件模板",
+      "library": "package:zytb_plugin_template/main.dart",
+      "function": "buildHome"
+    },
+    {
+      "id": "detail",
+      "title": "插件第二页",
+      "library": "package:zytb_plugin_template/main.dart",
+      "function": "buildDetail"
+    }
+  ],
+  "actions": [
+    {
+      "id": "home-menu",
+      "posId": "Homepage:Menu",
+      "label": "插件模板",
+      "icon": "extension",
+      "pageId": "home",
+      "order": 100
+    },
+    {
+      "id": "note-detail",
+      "posId": "Note:Detail",
+      "label": "查看笔记上下文",
+      "icon": "note",
+      "pageId": "home",
+      "order": 100
+    }
+  ]
+}

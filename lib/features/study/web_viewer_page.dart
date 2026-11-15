@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../../core/network/api_exception.dart';
+import '../../core/plugins/plugin_models.dart';
 import '../../core/util/urls.dart';
 import '../../core/web/app_webview_environment.dart';
 import '../../core/web/js_bridge.dart';
 import '../../shared/widgets/common.dart';
+import '../../shared/widgets/plugin_actions.dart';
 import 'attachment_opener.dart';
 
 enum _LoadMode { probing, url, data }
@@ -128,6 +130,16 @@ class _WebViewerPageState extends State<WebViewerPage> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.download_outlined),
+          ),
+          PluginActionButton(
+            posId: PluginPositions.columnAttachmentDetail,
+            pageContext: {
+              'posId': PluginPositions.columnAttachmentDetail,
+              'kind': 'html',
+              'url': widget.url,
+              'displayUrl': _displayUrl,
+              'name': widget.name,
+            },
           ),
           const SizedBox(width: 4),
         ],

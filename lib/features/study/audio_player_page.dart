@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 
 import '../../core/network/api_exception.dart';
+import '../../core/plugins/plugin_models.dart';
+import '../../core/util/urls.dart';
 import '../../shared/widgets/common.dart';
+import '../../shared/widgets/plugin_actions.dart';
 import 'attachment_opener.dart';
 
 class AudioPlayerPage extends StatefulWidget {
@@ -71,8 +74,10 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.name.isEmpty ? '音频' : widget.name,
-            overflow: TextOverflow.ellipsis),
+        title: Text(
+          widget.name.isEmpty ? '音频' : widget.name,
+          overflow: TextOverflow.ellipsis,
+        ),
         actions: [
           IconButton(
             tooltip: '下载',
@@ -84,6 +89,16 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                   )
                 : const Icon(Icons.download_outlined),
           ),
+          PluginActionButton(
+            posId: PluginPositions.columnAttachmentDetail,
+            pageContext: {
+              'posId': PluginPositions.columnAttachmentDetail,
+              'kind': 'audio',
+              'url': widget.url,
+              'displayUrl': imageDisplayUrl(absoluteOssUrl(widget.url)),
+              'name': widget.name,
+            },
+          ),
           const SizedBox(width: 4),
         ],
       ),
@@ -93,10 +108,13 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: _error != null
-                ? ErrorView(message: _error!, onRetry: () {
-                    setState(() => _error = null);
-                    _start();
-                  })
+                ? ErrorView(
+                    message: _error!,
+                    onRetry: () {
+                      setState(() => _error = null);
+                      _start();
+                    },
+                  )
                 : StreamBuilder<Duration>(
                     stream: _player.stream.duration,
                     builder: (context, durationSnapshot) {
@@ -104,7 +122,8 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                       return StreamBuilder<Duration>(
                         stream: _player.stream.position,
                         builder: (context, positionSnapshot) {
-                          final position = positionSnapshot.data ?? Duration.zero;
+                          final position =
+                              positionSnapshot.data ?? Duration.zero;
                           final max = duration.inMilliseconds.toDouble();
                           final value = position.inMilliseconds
                               .clamp(0, duration.inMilliseconds)
@@ -119,9 +138,11 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                                   color: theme.colorScheme.secondaryContainer,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: Icon(Icons.graphic_eq,
-                                    size: 76,
-                                    color: theme.colorScheme.onSecondaryContainer),
+                                child: Icon(
+                                  Icons.graphic_eq,
+                                  size: 76,
+                                  color: theme.colorScheme.onSecondaryContainer,
+                                ),
                               ),
                               const SizedBox(height: 24),
                               Text(
@@ -139,16 +160,21 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                                 onChanged: max <= 0
                                     ? null
                                     : (next) => _player.seek(
-                                          Duration(milliseconds: next.round()),
-                                        ),
+                                        Duration(milliseconds: next.round()),
+                                      ),
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(_time(position),
-                                      style: theme.textTheme.bodySmall),
-                                  Text(_time(duration),
-                                      style: theme.textTheme.bodySmall),
+                                  Text(
+                                    _time(position),
+                                    style: theme.textTheme.bodySmall,
+                                  ),
+                                  Text(
+                                    _time(duration),
+                                    style: theme.textTheme.bodySmall,
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 12),
@@ -159,10 +185,16 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                                     tooltip: '后退 15 秒',
                                     icon: const Icon(Icons.replay_10),
                                     iconSize: 32,
-                                    onPressed: () => _player.seek(Duration(
-                                      milliseconds: (position.inMilliseconds - 15000)
-                                          .clamp(0, duration.inMilliseconds),
-                                    )),
+                                    onPressed: () => _player.seek(
+                                      Duration(
+                                        milliseconds:
+                                            (position.inMilliseconds - 15000)
+                                                .clamp(
+                                                  0,
+                                                  duration.inMilliseconds,
+                                                ),
+                                      ),
+                                    ),
                                   ),
                                   const SizedBox(width: 20),
                                   StreamBuilder<bool>(
@@ -171,9 +203,11 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                                       final playing = snapshot.data ?? false;
                                       return IconButton.filled(
                                         tooltip: playing ? '暂停' : '播放',
-                                        icon: Icon(playing
-                                            ? Icons.pause
-                                            : Icons.play_arrow),
+                                        icon: Icon(
+                                          playing
+                                              ? Icons.pause
+                                              : Icons.play_arrow,
+                                        ),
                                         iconSize: 38,
                                         onPressed: _started
                                             ? () => _player.playOrPause()
@@ -186,10 +220,16 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                                     tooltip: '前进 15 秒',
                                     icon: const Icon(Icons.forward_10),
                                     iconSize: 32,
-                                    onPressed: () => _player.seek(Duration(
-                                      milliseconds: (position.inMilliseconds + 15000)
-                                          .clamp(0, duration.inMilliseconds),
-                                    )),
+                                    onPressed: () => _player.seek(
+                                      Duration(
+                                        milliseconds:
+                                            (position.inMilliseconds + 15000)
+                                                .clamp(
+                                                  0,
+                                                  duration.inMilliseconds,
+                                                ),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -203,8 +243,10 @@ class _AudioPlayerPageState extends State<AudioPlayerPage> {
                                       child: Slider(
                                         min: 0,
                                         max: 100,
-                                        value: (snapshot.data ?? 100)
-                                            .clamp(0, 100),
+                                        value: (snapshot.data ?? 100).clamp(
+                                          0,
+                                          100,
+                                        ),
                                         onChanged: (volume) =>
                                             _player.setVolume(volume),
                                       ),

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/network/api_exception.dart';
+import '../../core/plugins/plugin_models.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../data/api/column_api.dart';
 import '../../data/models/column.dart';
 import '../../shared/widgets/common.dart';
+import '../../shared/widgets/plugin_actions.dart';
 import 'column_message_list.dart';
 
 /// 学习 tab：在线专栏 / 我的收藏 / 我的消息（顶部按钮进入优客畅学）
@@ -128,10 +130,16 @@ class _StudyPageState extends State<StudyPage>
       appBar: AppBar(
         title: const Text('学习'),
         actions: [
-          TextButton.icon(
-            onPressed: () => context.push('/lesson'),
-            icon: const Icon(Icons.school_outlined, size: 18),
-            label: const Text('优客畅学'),
+          MergedPluginActionButton(
+            posId: PluginPositions.studyHome,
+            pageContext: {
+              'posId': PluginPositions.studyHome,
+              'tabIndex': _tab,
+              'tabName': _tabs[_tab],
+            },
+            nativeLabel: '优客畅学',
+            nativeIcon: Icons.school_outlined,
+            onNative: () => context.push('/lesson'),
           ),
           const SizedBox(width: 8),
         ],

@@ -187,7 +187,10 @@ class _ColumnPagesPageState extends State<ColumnPagesPage> {
           }
           final page = _pages[index];
           return InkWell(
-            onTap: () => context.push('/article/${page.id}'),
+            onTap: () => context.push(
+              '/article/${page.id}?colId=${widget.colId}'
+              '&colName=${Uri.encodeQueryComponent(widget.name)}',
+            ),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Column(

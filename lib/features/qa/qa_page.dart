@@ -4,12 +4,16 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/config/app_config.dart';
 import '../../core/network/api_exception.dart';
+import '../../core/plugins/plugin_manager.dart';
+import '../../core/plugins/plugin_models.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../core/storage/image_cache_manager.dart';
 import '../../core/util/urls.dart';
 import '../../data/api/quora_api.dart';
 import '../../data/models/quora.dart';
 import '../../shared/widgets/common.dart';
+import '../../shared/widgets/fab_menu.dart';
+import '../../shared/widgets/plugin_actions.dart';
 import '../../shared/widgets/user_avatar.dart';
 
 /// 随身答列表（复刻 QuoraView：领域 / 学科 / 关键词 / 时间 / 关注筛选 + 滚动懒加载）
@@ -245,19 +249,52 @@ class _QaPageState extends State<QaPage> {
           const SizedBox(width: 4),
         ],
       ),
-      body: Align(
-        alignment: Alignment.topCenter,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: desktop ? 900 : 760),
-          child: Column(
-            children: [
-              _buildCatalogBar(),
-              if (_filterExpanded) _buildFilterPanel(),
-              const Divider(height: 1),
-              Expanded(child: _buildBody()),
-            ],
+      body: Stack(
+        children: [
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: desktop ? 900 : 760),
+              child: Column(
+                children: [
+                  _buildCatalogBar(),
+                  if (_filterExpanded) _buildFilterPanel(),
+                  const Divider(height: 1),
+                  Expanded(child: _buildBody()),
+                ],
+              ),
+            ),
           ),
-        ),
+          ListenableBuilder(
+            listenable: PluginManager.instance,
+            builder: (context, _) {
+              final actions = PluginManager.instance.actionsFor(
+                PluginPositions.askPlusBtn,
+              );
+              if (actions.isEmpty) return const SizedBox.shrink();
+              return Positioned.fill(
+                child: FabMenu(
+                  tooltip: '问答操作',
+                  heroTag: 'qa-plugin-menu',
+                  items: [
+                    for (final action in actions)
+                      FabMenuItem(
+                        label: action.action.label,
+                        icon: pluginIcon(action.action.icon),
+                        onSelected: () => openPluginAction(context, action, {
+                          'posId': PluginPositions.askPlusBtn,
+                          'catalogId': _catalogId,
+                          'topicId': _topicId,
+                          'keyword': _keyword,
+                          'watchMode': _watchMode,
+                        }),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
