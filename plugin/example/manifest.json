@@ -1,7 +1,7 @@
 {
   "id": "com.zhongyu.toolbox.example.username",
   "name": "获取用户名示例",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "ZhongYuToolBox",
   "description": "调用 User/GetInfoAsync 获取当前登录账号的用户名。",
   "bytecode": "plugin.evc",

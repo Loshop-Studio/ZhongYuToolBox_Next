@@ -140,11 +140,19 @@ Future<void> showNativeAndPluginActions(
     onNative();
     return;
   }
+  final replacesNative = plugins.any(
+    (action) => action.action.replacesNative,
+  );
+  if (replacesNative && plugins.length == 1) {
+    await openPluginAction(context, plugins.single, pageContext);
+    return;
+  }
   final selected = await showAppActions(
     context,
     title: '选择操作',
     actions: [
-      AppAction(value: '_native', label: nativeLabel, icon: nativeIcon),
+      if (!replacesNative)
+        AppAction(value: '_native', label: nativeLabel, icon: nativeIcon),
       for (final action in plugins)
         AppAction(
           value: action.value,

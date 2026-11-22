@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:zy_board_renderer/board_renderer.dart';
 
 import '../../core/network/api_exception.dart';
+import '../../core/network/api_client.dart';
 import '../../core/plugins/plugin_models.dart';
 import '../../core/storage/image_cache_manager.dart';
 import '../../core/util/formatters.dart';
@@ -288,37 +290,34 @@ class _QaDetailPageState extends State<QaDetailPage> {
     final message = _messages[_selectedIndex.clamp(0, _messages.length - 1)];
     final theme = Theme.of(context);
     final isBoard = _isBoardContent(message);
+    if (isBoard) {
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: _buildMessageHeader(message, theme),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: BoardZipViewer(
+                  key: ValueKey('board-${message.id}'),
+                  url: imageDisplayUrl(absoluteOssUrl(message.content)),
+                  loadBytes: (url) =>
+                      ApiClient.instance.getBytes(url, skipAuth: true),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
       children: [
-        Row(
-          children: [
-            UserAvatar(
-              name: message.userName,
-              photo: message.userPhoto.isNotEmpty
-                  ? message.userPhoto
-                  : widget.askUserPhoto,
-              radius: 16,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    message.userName.isEmpty ? '未知用户' : message.userName,
-                    style: theme.textTheme.titleSmall,
-                  ),
-                  Text(
-                    formatDateTime(message.sendTime),
-                    style: theme.textTheme.labelSmall,
-                  ),
-                ],
-              ),
-            ),
-            if (message.isPrimary) const Chip(label: Text('公开')),
-          ],
-        ),
+        _buildMessageHeader(message, theme),
         const SizedBox(height: 16),
         if (message.snapshot.isNotEmpty) ...[
           GestureDetector(
@@ -336,13 +335,7 @@ class _QaDetailPageState extends State<QaDetailPage> {
           ),
           const SizedBox(height: 12),
         ],
-        if (isBoard && message.snapshot.isEmpty)
-          const ListTile(
-            leading: Icon(Icons.draw_outlined),
-            title: Text('画板附件'),
-            subtitle: Text('暂无预览图片'),
-          )
-        else if (!isBoard && message.content.isNotEmpty)
+        if (message.content.isNotEmpty)
           SelectableText(
             message.content,
             style: theme.textTheme.bodyLarge?.copyWith(height: 1.7),
@@ -353,9 +346,40 @@ class _QaDetailPageState extends State<QaDetailPage> {
     );
   }
 
+  Widget _buildMessageHeader(QuoraMessage message, ThemeData theme) => Row(
+    children: [
+      UserAvatar(
+        name: message.userName,
+        photo: message.userPhoto.isNotEmpty
+            ? message.userPhoto
+            : widget.askUserPhoto,
+        radius: 16,
+      ),
+      const SizedBox(width: 10),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              message.userName.isEmpty ? '未知用户' : message.userName,
+              style: theme.textTheme.titleSmall,
+            ),
+            Text(
+              formatDateTime(message.sendTime),
+              style: theme.textTheme.labelSmall,
+            ),
+          ],
+        ),
+      ),
+      if (message.isPrimary) const Chip(label: Text('公开')),
+    ],
+  );
+
   bool _isBoardContent(QuoraMessage message) {
-    final content = message.content;
-    return content.startsWith('http') && !content.contains(' ');
+    final uri = Uri.tryParse(message.content.trim());
+    return uri != null &&
+        uri.hasScheme &&
+        uri.path.toLowerCase().endsWith('.zip');
   }
 
   void _previewImage(BuildContext context, String snapshot) {

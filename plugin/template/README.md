@@ -1,39 +1,40 @@
-# 中育 Toolbox 插件模板
+# 中育 Toolbox Flutter 插件模板
 
-这是一个可独立复制为新仓库的插件工程。示例包含：
+这是一个使用 `flutter_eval` / `dart_eval` 编译的 Flutter Widget 插件模板。插件不是 WebView 页面，也不是原生动态库；宿主在受控的 EVC 解释器中执行入口函数，并把返回的 Flutter `Widget` 放入原生导航栈。
+
+模板展示：
 
 - 在 `Homepage:Menu` 和 `Note:Detail` 注册入口
-- 注册并跳转两个插件页面
-- 获取最新 token、API Host、用户名和头像
-- 使用 `dart:io HttpClient` 发起带 token 的 HTTP 请求
-- 使用 `dart:io File` 读写本地文件
+- 注册并跳转两个 Flutter 页面
+- 读取最新 token、API Host、用户名和头像等宿主信息
+- 通过宿主 HTTP API 请求接口
+- 使用 Dart `File` 同步读写插件目录文件
 
-## 1. 修改插件信息
+## 工程结构
 
-修改 `pubspec.yaml` 中的 package name，并同步修改 `manifest.json` 中页面的 `library`：
-
-```json
-"library": "package:你的_package_name/main.dart"
+```text
+manifest.json
+pubspec.yaml
+analysis_options.yaml
+lib/main.dart
+build.ps1
+build.sh
 ```
 
-然后修改 `manifest.json` 的 `id`、`name`、`version`、页面和入口。
-
-## 2. 编写页面
-
-每个 manifest 页面函数都必须采用固定四参数 ABI：
+入口函数必须返回完整的 Flutter Widget，并遵循四参数 ABI：
 
 ```dart
-Widget buildPage(
+Widget buildHome(
   Map<String, dynamic> pageContext,
   Map<String, dynamic> host,
   Map<String, dynamic> Function() getLatestHost,
   void Function(String pageId, Map<String, dynamic> context) openPage,
-)
+) { ... }
 ```
 
-完整字段和 posId 见 [插件开发规范](../../docs/plugin_development.md)。
+模板中的页面只使用同步逻辑。HTTP 使用 `host['httpRequest']` 提交请求，再通过 `host['getHttpResult']` 读取宿主保存的结果；不要在插件页面中使用 `async` / `await`。
 
-## 3. 编译打包
+## 编译打包
 
 Windows：
 
@@ -48,15 +49,6 @@ chmod +x build.sh
 ./build.sh
 ```
 
-脚本会自动：
+输出为 `dist/zytb_plugin_template.zytbplugin`，ZIP 根目录直接包含 `manifest.json` 与 `plugin.evc`。导入宿主后，插件会安装到软件目录的 `plugins/` 下；如果操作系统拒绝写入，则使用应用专属数据目录。
 
-1. 执行 `flutter pub get`
-2. 下载与宿主匹配的 `flutter_eval.json`
-3. 使用 `dart_eval 0.8.5` 编译 `plugin.evc`
-4. 生成 `dist/zytb_plugin_template.zytbplugin`
-
-`flutter_eval` 仅支持 Flutter/Dart API 的子集。若编译器提示某个 Widget 或方法未绑定，请换用已支持的 API，而不是依赖宿主内部类。
-
-页面入口请直接返回完整 Widget 树，不要返回插件自定义的 `StatelessWidget` / `StatefulWidget`。
-插件侧不要使用 `async` / `await`：HTTP 使用 `httpRequest/getHttpResult`，本地文件使用同步的 `File.*Sync` API。
-宿主 Map 的动态值请直接用 `value == ''` 判断空值，不要调用 `toString/trim/isEmpty/isNotEmpty`，也不要把动态值插值后直接传给 Widget。
+完整 ABI、权限、上下文和 `posId` 说明见 [插件开发规范](../../docs/plugin_development.md)。

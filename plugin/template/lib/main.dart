@@ -104,9 +104,11 @@ void _writeFile(
 void _httpRequest(Map<String, dynamic> Function() getLatestHost) {
   final host = getLatestHost();
   final apiHost = host['apiHost'].toString();
-  final endpoint = apiHost.endsWith('/')
-      ? '${apiHost}api/services/app/User/GetInfoAsync'
-      : '$apiHost/api/services/app/User/GetInfoAsync';
+  final endpoint = _joinApiPath(
+    apiHost,
+    '/api/services/app/User/GetInfoAsync',
+  );
+  if (endpoint.isEmpty) return;
   final void Function(String, String, Map<String, dynamic>) httpRequest =
       host['httpRequest'];
   httpRequest(
@@ -118,4 +120,11 @@ void _httpRequest(Map<String, dynamic> Function() getLatestHost) {
       'timeoutSeconds': 20,
     },
   );
+}
+
+String _joinApiPath(String base, String path) {
+  final cleanedBase = base.replaceFirst(RegExp(r'/+$'), '');
+  if (cleanedBase.isEmpty) return '';
+  final cleanedPath = path.startsWith('/') ? path : '/$path';
+  return '$cleanedBase$cleanedPath';
 }

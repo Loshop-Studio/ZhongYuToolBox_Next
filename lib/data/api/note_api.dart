@@ -1,8 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 import '../../core/crypto/zy_aes.dart';
+import '../../core/storage/app_file_store.dart';
 import '../../core/network/api_client.dart';
 import '../../core/network/api_exception.dart';
 import '../models/note.dart';
@@ -258,10 +262,63 @@ class NoteApi {
       '${const JsonEncoder.withIndent('  ').convert(decoded)}',
     );
     final list = decoded['resourceList'];
+    debugPrint(
+      '[NoteApi.getResources] fileId=$fileId reslist:\n'
+      '${const JsonEncoder.withIndent('  ').convert(list)}',
+    );
     if (list is! List) return <NoteResource>[];
-    return list
+    final resources = list
         .whereType<Map>()
         .map((e) => NoteResource.fromJson(Map<String, dynamic>.from(e)))
         .toList();
+    await _syncResources(resources);
+    return resources;
+  }
+
+  static Future<void> _syncResources(List<NoteResource> resources) async {
+    final root = await AppFileStore.instance.directory();
+    final noteRoot = Directory('${root.path}${Platform.pathSeparator}note');
+    final filesRoot = Directory(
+      '${noteRoot.path}${Platform.pathSeparator}filesystem',
+    );
+    await filesRoot.create(recursive: true);
+    final hashFile = File('${noteRoot.path}${Platform.pathSeparator}hashDb.db');
+    final db = sqlite3.open(hashFile.path);
+    db.execute('''
+      CREATE TABLE IF NOT EXISTS resource_hashes (
+        resource_id TEXT PRIMARY KEY,
+        md5 TEXT NOT NULL
+      )
+    ''');
+    for (final resource in resources) {
+      if (resource.id.isEmpty || resource.ossImageUrl.isEmpty) continue;
+      final relative = resource.id.replaceFirst(RegExp(r'^[/\\]+'), '');
+      final target = File(
+        '${filesRoot.path}${Platform.pathSeparator}${relative.replaceAll('/', Platform.pathSeparator)}',
+      );
+      final rows = db.select(
+        'SELECT md5 FROM resource_hashes WHERE resource_id = ?',
+        [resource.id],
+      );
+      if (rows.isNotEmpty &&
+          rows.first['md5'] == resource.md5 &&
+          await target.exists()) {
+        continue;
+      }
+      try {
+        await target.parent.create(recursive: true);
+        await Dio().download(resource.ossImageUrl, target.path);
+        db.execute(
+          '''INSERT INTO resource_hashes(resource_id, md5) VALUES (?, ?)
+             ON CONFLICT(resource_id) DO UPDATE SET md5 = excluded.md5''',
+          [resource.id, resource.md5],
+        );
+      } catch (error) {
+        debugPrint(
+          '[NoteApi._syncResources] download failed: ${resource.ossImageUrl} $error',
+        );
+      }
+    }
+    db.close();
   }
 }
