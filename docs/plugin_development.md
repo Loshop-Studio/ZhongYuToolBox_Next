@@ -1,5 +1,7 @@
 # 中育 Toolbox Flutter 插件开发指南
 
+[TOC]
+
 中育 Toolbox 插件是扩展名为 `.zytbplugin` 的 ZIP 包，运行时使用 `flutter_eval` / `dart_eval` 执行预先编译的 Dart 字节码，并把入口函数返回的 Flutter `Widget` 放入宿主的原生导航栈。
 
 这套机制不是 WebView，也不是原生动态库。Windows、Android 和 iOS 发布包都采用 AOT，安装后不能把新的 Dart 源码编译进宿主；因此可安装插件必须先编译为 EVC，再由解释器执行。
@@ -232,3 +234,319 @@ EVC 解释执行发生在 Flutter UI isolate。当前 `dart_eval` 执行器没�
 ## 图标
 
 内置名称包括 `add`、`article`、`book`、`build`、`camera`、`cloud`、`code`、`download`、`edit`、`fact_check`、`file`、`folder`、`forum`、`image`、`info`、`link`、`note`、`open_in_new`、`person`、`school`、`search`、`send`、`settings`、`share`、`star`、`upload`、`web`。未知名称回退为扩展图标。
+
+
+## 从零开发教程：获取用户名
+
+本节带你从模板做出一个完整插件：它在主页功能区注册按钮，打开 Flutter 页面后由宿主发起 HTTP 请求，并显示当前用户名。
+
+### 第 1 步：复制模板并改包名
+
+复制 plugin/template 为一个新目录，例如 plugin/my_username。修改 pubspec.yaml：
+
+    name: my_username
+    description: Get current username for ZhongYu Toolbox
+    version: 1.0.0
+    publish_to: none
+
+library URI 中的 my_username 必须与这里的 name 一致。
+
+### 第 2 步：注册页面和按钮
+
+在 manifest.json 中声明页面入口和 Homepage:Menu action：
+
+    {
+      "id": "com.example.username",
+      "name": "获取用户名",
+      "version": "1.0.0",
+      "author": "你的名字",
+      "description": "从当前账号资料接口读取用户名。",
+      "bytecode": "plugin.evc",
+      "pages": [
+        {
+          "id": "home",
+          "title": "获取用户名",
+          "library": "package:my_username/main.dart",
+          "function": "buildHome"
+        }
+      ],
+      "actions": [
+        {
+          "id": "get-username",
+          "posId": "Homepage:Menu",
+          "label": "获取用户名",
+          "icon": "person",
+          "pageId": "home",
+          "order": 10
+        }
+      ]
+    }
+
+manifest 的 id 要全局唯一；page id 和 action id 要在插件内唯一。action.pageId 必须指向已声明的 page。
+
+### 第 3 步：写页面和请求
+
+buildHome 是同步入口。页面首次进入时先读取已有请求状态，按钮点击后提交新请求：
+
+    import 'package:flutter/material.dart';
+    
+    Widget buildHome(
+      Map<String, dynamic> pageContext,
+      Map<String, dynamic> host,
+      Map<String, dynamic> Function() getLatestHost,
+      void Function(String, Map<String, dynamic>) openPage,
+    ) {
+      final latest = getLatestHost();
+      final getResult =
+          latest['getHttpResult'] as Map<String, dynamic> Function(String);
+      final state = getResult('username');
+      Widget status;
+    
+      if (state['pending'] == true) {
+        status = const Text('正在获取……');
+      } else if ((state['error'] ?? '').toString().isNotEmpty) {
+        status = Text(state['error'].toString());
+      } else if (state['started'] != true) {
+        status = const Text('点击按钮获取用户名');
+      } else {
+        final response = state['response'];
+        final json = response is Map ? response['json'] : null;
+        final result = json is Map ? json['result'] : null;
+        final username = result is Map ? result['userName'] : null;
+        status = Text((username ?? '接口未返回用户名').toString());
+      }
+    
+      return Scaffold(
+        appBar: AppBar(title: const Text('获取用户名')),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              status,
+              ElevatedButton(
+                onPressed: () => _loadUsername(getLatestHost),
+                child: const Text('获取用户名'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    
+    void _loadUsername(
+      Map<String, dynamic> Function() getLatestHost,
+    ) {
+      final current = getLatestHost();
+      final apiHost =
+          current['apiHost'].toString().replaceFirst(RegExp(r'/+$'), '');
+      if (apiHost.isEmpty) return;
+    
+      final request = current['httpRequest']
+          as void Function(String, String, Map<String, dynamic>);
+      request(
+        'GET',
+        apiHost + '/api/services/app/User/GetInfoAsync',
+        {
+          'requestId': 'username',
+          'headers': {
+            'Authorization':
+                'Bearer ' + current['token'].toString(),
+            'Content-Type': 'application/json',
+          },
+          'timeoutSeconds': 20,
+        },
+      );
+    }
+
+宿主 HTTP 是异步执行的：点击按钮调用 httpRequest 后，插件不要 await；宿主完成时会更新 getHttpResult 并触发页面刷新。
+
+### 第 4 步：编译并在本地安装
+
+Windows PowerShell：
+
+    cd plugin/my_username
+    .\build.ps1
+
+macOS/Linux：
+
+    cd plugin/my_username
+    chmod +x build.sh
+    ./build.sh
+
+在 dist 目录找到生成的 .zytbplugin，然后在客户端打开“设置 → 插件 → 导入”。检查主页功能区是否出现“获取用户名”，进入后点击按钮，确认加载、错误和用户名状态均正常。
+
+## 适配所有位置的开发提示
+
+按钮文字、图标、排序由 manifest action 控制；每个 action 指向一个 page。使用原页面信息时从 pageContext 读取，不要再重复请求宿主已经传入的 ID 或 URL。
+
+例如专栏详情的 columnId 和文章 pageId：
+
+    final columnId = (pageContext['columnId'] ?? '').toString();
+    final articleId = (pageContext['pageId'] ?? '').toString();
+    final articleUrl = (pageContext['url'] ?? '').toString();
+
+附件预览位置传 kind、url、displayUrl、name；图库详情会传资源 id 和 url；笔记详情会传 fileId。字段都可能为空，需先做空值检查。
+
+一条 action 只能指向一个 page，但可以在多个 posId 注册多个 action，也可以让多个 action 复用同一个 page。若多个插件注册同一位置，宿主会将其放入操作列表；action.order 数值小的排在前面。
+
+## 完整 posId 上下文字段参考
+
+| posId | 常见上下文 |
+| --- | --- |
+| Homepage:Menu | route、posId |
+| Homepage:UserCard | route、username、displayName、userId |
+| Note:PlusBtn | folderId、folderName、allMode |
+| Note:Detail | fileId、fileName、pageCount、pageIndex |
+| Gallery:Add | recycle、pictureCount |
+| Gallery:Detail | id、picture、url、name、size、createTime、index、total、recycle |
+| Exercise:Home | listType、tabIndex、tabName |
+| Exercise:Detail | taskId、name、view、wrongCount、task、questionCount、questions |
+| Study:Home | tabIndex、tabName |
+| Column:Detail | pageId、columnId、columnName、url |
+| Column:AttachmentDetail | kind、url、displayUrl、name |
+| Ask:PlusBtn | catalogId、topicId、keyword、watchMode |
+| Ask:Detail | sessionId、askUserPhoto、selectedIndex、messages |
+
+上述字段是当前宿主提供的常见字段，不是永远固定的完整协议。未知字段必须忽略，缺少字段必须正常处理。
+
+## 官方索引源和自动更新
+
+客户端预置的官方索引源是：
+
+    https://git.loshop.com.cn/LoshopStudio/ZytbAddonIndex/raw/branch/main/index.txt
+
+用户可以添加多个索引源。官方源不能删除；各源可以单独启用“自动更新”。宿主请求索引时会在 URL 后追加当前毫秒时间戳参数 v，避免使用旧缓存，不要把这个动态值作为源地址保存。
+
+推荐 index.txt 每个插件一行：
+
+    (com.example.username@1.0.0)[获取用户名]读取当前账号用户名
+
+包 URL 根据索引文件位置生成：
+
+    index.txt 同级目录/插件ID/插件ID.zytbplugin
+
+可选 detail.txt 三行内容：
+
+    作者
+    1.0.0
+    更新说明
+
+第一行作者，第二行版本，第三行起为更新日志。相同 ID 出现在多个源时，按三段版本号数值选择最高版本；版本相同按源列表顺序选择。
+
+## 官方上架教程：zpi.loshop.com.cn
+
+官方管理页地址：
+
+    https://zpi.loshop.com.cn/
+
+当前页面提供“创建插件”“更新插件”“删除插件”“当前索引”四个标签。索引行格式为：
+
+    (插件ID@主版本.次版本.修订版本)[插件名称]插件介绍
+
+### 上架前准备
+
+1. 已完成本地开发并编译出 .zytbplugin；
+2. 插件包在客户端成功导入并运行；
+3. manifest 与网站上要提交的信息一致；
+4. version 使用三段式，如 1.0.0；
+5. ZIP 根目录直接包含 manifest.json 和 plugin.evc；
+6. 插件包小于 50 MiB；
+7. 已准备作者、简介和更新说明；
+8. 准备一个安全位置保存网站生成的插件密钥。
+
+### 首次创建
+
+在“创建插件”标签填写：
+
+| 网站字段 | 填写内容 | 页面限制 |
+| --- | --- | --- |
+| 插件 ID | manifest.id | 必填；字母或数字开头，可有字母、数字、点、下划线、短横线，最长 128 字符；宿主 id 上限为 80 字符 |
+| 插件名称 | manifest.name | 必填，最长 100 字符 |
+| 插件介绍 | manifest.description | 必填，最长 1000 字符 |
+| 作者名称 | manifest.author | 必填，最长 100 字符 |
+| 三段式版本号 | manifest.version | 必须为数字.数字.数字，例如 1.2.3 |
+| 更新说明 | 本次发布的变更 | 必填，最长 3000 字符 |
+| 插件文件 | build 脚本生成的 .zytbplugin | 必填，最大 50 MiB |
+
+提交创建后，网站会返回插件密钥。立即保存在密码管理器或离线安全位置。后续更新和删除需要该密钥。不要将密钥放入源码、manifest、插件包、Git 或公开聊天。
+
+### 发布更新
+
+1. 修改插件源码；
+2. 同时递增 pubspec.yaml 和 manifest.json 的 version；
+3. 运行 build.ps1 或 build.sh 生成新包；
+4. 本地安装并确认新版本可运行；
+5. 打开网站“更新插件”标签；
+6. 输入插件 ID 和创建时保存的插件密钥；
+7. 填入插件名称、介绍、作者、新版本和更新说明；
+8. 选择新的 .zytbplugin 并提交；
+9. 到“当前索引”确认 ID、版本和介绍。
+
+更新表单允许不选择插件文件，这只适合单独修改介绍、作者或更新说明；代码变化必须上传重建的新包。
+
+版本建议：
+
+    1.0.0 -> 1.0.1  修复问题
+    1.0.1 -> 1.1.0  增加向后兼容功能
+    1.1.0 -> 2.0.0  不兼容变更
+
+每次发布代码都增加版本号，不要用相同版本替换不同的 EVC 字节码，否则客户端可能认为无需更新。
+
+### 删除插件
+
+“删除插件”需要插件 ID 和插件密钥。删除会影响官方索引里的安装和更新，且可能不可逆。操作前确认目标 ID，备份源码、最终包和密钥，并评估是否应该先发布停更说明。
+
+### 核对发布结果
+
+在“当前索引”确认新条目已出现，检查 ID、版本号、名称和简介。之后在客户端手动刷新插件索引，再从官方源安装或更新。
+
+官方索引源下载 URL 为：
+
+    https://git.loshop.com.cn/LoshopStudio/ZytbAddonIndex/raw/branch/main/index.txt
+
+平台为新插件生成的下载地址遵循：
+
+    官方索引目录/插件ID/插件ID.zytbplugin
+
+## 依赖选择和平台能力
+
+插件可在 pubspec.yaml 中添加 Dart/Flutter 依赖，但 pub 包能下载并不保证 EVC 可编译、可运行。纯 Dart 包通常更容易兼容；依赖原生库、FFI、Platform Channel 或原生注册的 Flutter 插件，需要宿主应用提前集成对应部分。插件不能在安装时向现有客户端动态加入原生代码。
+
+建议从简单、纯 Dart 依赖开始，并逐个验证编译、运行和 Windows/Android 表现。网络推荐使用宿主 httpRequest，以减少平台差异。
+
+## 常见错误定位
+
+### 找不到外部函数 / nonexistent external function
+
+通常是当前 flutter_eval 未注册插件用到的 Flutter 构造函数或扩展。根据堆栈中的 Ex 编号定位调用，再检查该构造函数是否在当前 flutter_eval bridge 中注册。声明存在不代表构造函数已注册。可以换用已有桥接的组件，例如 GestureDetector，或把复杂组件放到宿主回调中创建。
+
+### $null 不能转换为 $Instance
+
+常见原因是缺少 Map 字段、宿主回调为空或可空参数被传入要求非空对象的 Flutter API。先读取动态值到局部变量，做 null 检查，再转换为明确类型。
+
+### Debug 卡死、Release 灰屏
+
+EVC 入口在 Flutter UI isolate 同步执行。死循环、大量同步计算、同步网络或重复发起请求会阻塞页面。入口只应读取当前状态并构造 Widget；请求和文件操作应放到明确的用户操作中。
+
+### 更新后还是旧代码
+
+确认插件 version 已递增，manifest.json 和 pubspec.yaml 一致，重新运行构建脚本，客户端更新/重新导入最新包并完全重启应用。旧版本的字节码不会因为源码变更自动刷新。
+
+## 发布检查清单
+
+- [ ] manifest 的 id、name、version 正确且唯一；
+- [ ] pubspec.yaml 包名和 library URI 一致；
+- [ ] page/action ID 唯一；
+- [ ] action.pageId 存在，posId 有效；
+- [ ] 入口函数四参数顺序正确且返回 Widget；
+- [ ] 动态字段有空值处理；
+- [ ] Token 在发请求前通过 getLatestHost 重新读取；
+- [ ] requestId 在页面内唯一；
+- [ ] 文件只写入 pluginPath 下的插件数据目录；
+- [ ] 没有使用未经确认的 Flutter/EVC bridge API；
+- [ ] 没有入口副作用、死循环或长时间同步任务；
+- [ ] manifest.json 和 pubspec.yaml 版本一致；
+- [ ] 构建成功，ZIP 根目录结构正确；
+- [ ] 文件小于 50 MiB；
+- [ ] 客户端本地安装运行成功；
+- [ ] 上架后保管插件密钥并核对当前索引。

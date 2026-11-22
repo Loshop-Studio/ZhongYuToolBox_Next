@@ -33,7 +33,7 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
       - run: flutter pub get
-      - run: flutter build windows --release
+      - run: flutter build windows --release --no-tree-shake-icons
       - name: Install and verify Windows release bundle
         shell: pwsh
         run: |
@@ -127,7 +127,7 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
       - run: flutter pub get
-      - run: flutter build ios --release --no-codesign
+      - run: flutter build ios --release --no-codesign --no-tree-shake-icons
       - name: Verify iOS application bundle
         shell: bash
         run: |
@@ -168,7 +168,7 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
       - run: flutter pub get
-      - run: flutter build macos --release
+      - run: flutter build macos --release --no-tree-shake-icons
       - name: Package macOS app
         shell: bash
         run: |

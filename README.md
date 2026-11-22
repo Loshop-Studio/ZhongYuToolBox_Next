@@ -94,3 +94,9 @@ iOS 需在 macOS 上 `flutter build ios`。
 - 领创（linspirer）与本地分享（ShareView）
 
 详细方案见 [PLAN.md](PLAN.md)。
+
+## 插件开发与上架
+
+- [详细插件开发指南、教程与官方上架流程](docs/plugin_development.md)
+- [Flutter/EVC 插件模板](plugin/template/README.md)
+- [获取用户名示例插件](plugin/example/README.md)

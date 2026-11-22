@@ -229,6 +229,8 @@ class _CloudNoteLocalPagePreviewState extends State<CloudNoteLocalPagePreview> {
   }
 
   bool _needsScreenshot(CloudNoteGraph graph) {
+    final sourceFileName = graph.sourceFileName;
+    if (sourceFileName != null && sourceFileName.isNotEmpty) return true;
     if ((graph.graphEnum == 3 || graph.graphEnum == 4) &&
         graph.pointList.isEmpty) {
       return true;
