@@ -14,7 +14,6 @@ import 'features/auth/login_page.dart';
 import 'features/dev/develop_page.dart';
 import 'features/download/app_downloads_page.dart';
 import 'features/home/home_page.dart';
-import 'features/home/user_profile_page.dart';
 import 'features/home/announcement_detail_page.dart';
 import 'features/home/message_center_page.dart';
 import 'features/home/screenshot_assistant/screenshot_assistant_page.dart';
@@ -216,11 +215,6 @@ final GoRouter appRouter = GoRouter(
       path: '/messages',
       parentNavigatorKey: rootNavigatorKey,
       builder: (_, __) => const MessageCenterPage(),
-    ),
-    GoRoute(
-      path: '/profile',
-      parentNavigatorKey: rootNavigatorKey,
-      builder: (_, __) => const UserProfilePage(),
     ),
     GoRoute(
       path: '/announcement',

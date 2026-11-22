@@ -12,7 +12,7 @@
 | 测评 | 新测评列表 → 题目（HTML）/ 概览 / 分析；右上角进入错题本 |
 | 主页 | 账号卡片、切换用户、未完成测评统计、功能入口、设置 |
 | 学习 | 在线专栏（学科 → 专栏 → 文章 HTML）、我的收藏，顶部按钮进入优客畅学 |
-| 问答 | 随身答（领域筛选、会话列表、会话详情、回复） |
+| 问答 | 随身答（领域筛选、会话列表、会话详情、回复；画板 ZIP 单页静态显示与录制回放） |
 
 登录为账号列表式：首次「添加账号」（选学校 → 输入用户名密码），之后打开应用或切换用户都会用本地保存的凭据自动登录。
 
@@ -90,7 +90,6 @@ iOS 需在 macOS 上 `flutter build ios`。
 
 - 云笔记「导入 PDF 文档」：需要把 PDF 渲染成图片（pdfium / Android PDFRenderer），会引入原生库，需三端分别验证
 - 笔记矢量画板渲染（`snapshot.bin` + `data.mdb`）：需移植 ezy-board-viewer 解析器，已留 `NoteBoardRenderer` 抽象
-- 随身答画板回复/播放（fabric 画板 + board zip）
 - 一键订正（`examAutoReview`）
 - 领创（linspirer）与本地分享（ShareView）
 

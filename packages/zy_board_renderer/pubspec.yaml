@@ -1,0 +1,33 @@
+name: zy_board_renderer
+description: Read-only rendering components backed by zy_board_editor's board codec.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: '>=3.10.0 <4.0.0'
+  flutter: '>=3.38.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  archive: ^3.6.1
+  crypto: ^3.0.7
+  fixnum: ^1.1.1
+  image: ^4.3.0
+  media_kit: ^1.2.6
+  protobuf: ^6.1.0
+
+flutter:
+  assets:
+    - assets/fonts/OFL.txt
+    - assets/fonts/Roboto-LICENSE.txt
+  fonts:
+    - family: Board Sans
+      fonts:
+        - asset: assets/fonts/BoardSans.otf
+    - family: Board Android
+      fonts:
+        - asset: assets/fonts/BoardRoboto.ttf
+    - family: Board Document
+      fonts:
+        - asset: assets/fonts/BoardDocument.otf

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 
 import '../config/app_config.dart';
@@ -34,8 +36,12 @@ class ApiClient {
 
   String resolveUrl(String path, String? baseUrl) {
     if (path.startsWith('http://') || path.startsWith('https://')) return path;
-    final base = (baseUrl != null && baseUrl.isNotEmpty) ? baseUrl : defaultBaseUrl;
-    final cleaned = base.endsWith('/') ? base.substring(0, base.length - 1) : base;
+    final base = (baseUrl != null && baseUrl.isNotEmpty)
+        ? baseUrl
+        : defaultBaseUrl;
+    final cleaned = base.endsWith('/')
+        ? base.substring(0, base.length - 1)
+        : base;
     final suffix = path.startsWith('/') ? path : '/$path';
     return '$cleaned$suffix';
   }
@@ -82,7 +88,10 @@ class ApiClient {
 
     final status = response.statusCode ?? 0;
     if (status >= 400) {
-      throw ApiException(_extractMessage(response) ?? '请求失败: $status', statusCode: status);
+      throw ApiException(
+        _extractMessage(response) ?? '请求失败: $status',
+        statusCode: status,
+      );
     }
 
     return response.data;
@@ -100,7 +109,11 @@ class ApiClient {
         url,
         data: data,
         queryParameters: query,
-        options: Options(method: method, headers: headers, validateStatus: (_) => true),
+        options: Options(
+          method: method,
+          headers: headers,
+          validateStatus: (_) => true,
+        ),
       );
     } on DioException catch (e) {
       throw ApiException(_dioMessage(e));
@@ -131,7 +144,10 @@ class ApiClient {
         ),
       );
       if ((resp.statusCode ?? 0) >= 400) {
-        throw ApiException('请求失败: ${resp.statusCode}', statusCode: resp.statusCode);
+        throw ApiException(
+          '请求失败: ${resp.statusCode}',
+          statusCode: resp.statusCode,
+        );
       }
       return resp.data?.toString() ?? '';
     } on DioException catch (e) {
@@ -139,11 +155,76 @@ class ApiClient {
     }
   }
 
+  /// 下载二进制内容；相对地址沿用默认业务域名，绝对地址可用于 OSS 附件。
+  ///
+  /// 和 [request] 一样，默认附带当前登录令牌并在 401 时恢复会话后重试；
+  /// 对公开的外部附件请传 `skipAuth: true`，避免把业务令牌发给资源域名。
+  Future<Uint8List> getBytes(
+    String path, {
+    String? baseUrl,
+    Map<String, dynamic>? query,
+    Map<String, String>? headers,
+    bool skipAuth = false,
+    bool skipRecover = false,
+  }) async {
+    final session = SessionManager.instance.session;
+    final url = resolveUrl(path, baseUrl);
+    final finalHeaders = <String, String>{
+      if (!skipAuth && session.token.isNotEmpty)
+        'Authorization': 'Bearer ${session.token}',
+      ...?headers,
+    };
+
+    late final Response<dynamic> response;
+    try {
+      response = await dio.get<dynamic>(
+        url,
+        queryParameters: query,
+        options: Options(
+          headers: finalHeaders,
+          responseType: ResponseType.bytes,
+          validateStatus: (_) => true,
+        ),
+      );
+    } on DioException catch (e) {
+      throw ApiException(_dioMessage(e));
+    }
+
+    if (response.statusCode == 401 && !skipAuth && !skipRecover) {
+      final recovered = await SessionManager.instance.recoverSession();
+      if (recovered) {
+        return getBytes(
+          path,
+          baseUrl: baseUrl,
+          query: query,
+          headers: headers,
+          skipAuth: skipAuth,
+          skipRecover: true,
+        );
+      }
+      await SessionManager.instance.clearSession();
+      throw ApiException('登录已过期，请重新登录', statusCode: 401);
+    }
+
+    final status = response.statusCode ?? 0;
+    if (status >= 400) {
+      throw ApiException(
+        _extractMessage(response) ?? '请求失败: $status',
+        statusCode: status,
+      );
+    }
+    final data = response.data;
+    if (data is Uint8List) return data;
+    if (data is List<int>) return Uint8List.fromList(data);
+    throw ApiException('响应不是有效的二进制数据');
+  }
+
   String? _extractMessage(Response<dynamic> response) {
     final data = response.data;
     if (data is Map) {
       final error = data['error'];
-      if (error is Map && error['message'] != null) return error['message'].toString();
+      if (error is Map && error['message'] != null)
+        return error['message'].toString();
       if (data['message'] != null) return data['message'].toString();
       if (data['msg'] != null) return data['msg'].toString();
     }

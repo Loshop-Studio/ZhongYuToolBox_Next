@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:media_kit_video/media_kit_video_controls/media_kit_video_controls.dart';
 
 import '../../core/network/api_exception.dart';
 import '../../core/plugins/plugin_models.dart';
@@ -80,8 +79,8 @@ class _NativeVideoViewState extends State<NativeVideoView> {
         Positioned.fill(
           child: Video(
             controller: _videoController,
-            // 桌面端带完整进度条 / 音量 / 倍速 / 全屏
-            controls: MaterialDesktopVideoControls,
+            // 按平台选择控制栏：移动端使用触控交互，桌面端使用鼠标交互。
+            controls: AdaptiveVideoControls,
             fit: BoxFit.contain,
           ),
         ),

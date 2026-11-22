@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// 插件可挂载的宿主位置。
+/// Flutter/EVC 插件可挂载的宿主位置。
 abstract final class PluginPositions {
   static const String homepageMenu = 'Homepage:Menu';
   static const String homepageUserCard = 'Homepage:UserCard';
@@ -38,9 +38,11 @@ class PluginManifest {
     required this.id,
     required this.name,
     required this.version,
-    required this.bytecode,
     required this.pages,
     required this.actions,
+    this.bytecode = 'plugin.evc',
+    this.runtime = 'flutter',
+    this.entry = '',
     this.description = '',
     this.author = '',
   });
@@ -48,6 +50,10 @@ class PluginManifest {
   final String id;
   final String name;
   final String version;
+
+  /// Renderer ABI. Only `flutter`/`evc` are supported; web pages are rejected.
+  final String runtime;
+  final String entry;
   final String description;
   final String author;
   final String bytecode;
@@ -58,6 +64,14 @@ class PluginManifest {
     final id = (json['id'] ?? '').toString().trim();
     final name = (json['name'] ?? '').toString().trim();
     final version = (json['version'] ?? '').toString().trim();
+    final declared = (json['runtime'] ?? '').toString().trim().toLowerCase();
+    if (declared == 'web' || declared == 'html' || declared == 'webview') {
+      throw const FormatException('不支持 WebView/HTML 插件，插件必须使用 Flutter/EVC');
+    }
+    if (declared.isNotEmpty && declared != 'flutter' && declared != 'evc') {
+      throw FormatException('不支持的插件 runtime：$declared');
+    }
+    const runtime = 'flutter';
     final bytecode = (json['bytecode'] ?? 'plugin.evc').toString().trim();
     if (!RegExp(r'^[a-zA-Z0-9][a-zA-Z0-9._-]{1,79}$').hasMatch(id)) {
       throw const FormatException('插件 id 只能包含字母、数字、点、下划线和短横线（2-80 字符）');
@@ -69,7 +83,6 @@ class PluginManifest {
     }
 
     final pagesRaw = json['pages'];
-    final actionsRaw = json['actions'];
     if (pagesRaw is! List || pagesRaw.isEmpty) {
       throw const FormatException('插件至少需要注册一个 page');
     }
@@ -85,6 +98,7 @@ class PluginManifest {
       if (!pageIds.add(page.id)) throw FormatException('page id 重复：${page.id}');
     }
 
+    final actionsRaw = json['actions'];
     final actions = actionsRaw is List
         ? actionsRaw
               .whereType<Map>()
@@ -112,11 +126,12 @@ class PluginManifest {
         );
       }
     }
-
     return PluginManifest(
       id: id,
       name: name,
       version: version,
+      runtime: runtime,
+      entry: '',
       bytecode: bytecode,
       pages: pages,
       actions: actions,
@@ -176,6 +191,7 @@ class PluginActionDefinition {
     required this.pageId,
     this.icon = 'extension',
     this.order = 0,
+    this.replacesNative = false,
   });
 
   final String id;
@@ -184,6 +200,7 @@ class PluginActionDefinition {
   final String icon;
   final String pageId;
   final int order;
+  final bool replacesNative;
 
   factory PluginActionDefinition.fromJson(Map<String, dynamic> json) {
     final id = (json['id'] ?? '').toString().trim();
@@ -200,6 +217,7 @@ class PluginActionDefinition {
       pageId: pageId,
       icon: (json['icon'] ?? 'extension').toString(),
       order: (json['order'] as num?)?.toInt() ?? 0,
+      replacesNative: json['replacesNative'] == true,
     );
   }
 }
@@ -214,6 +232,10 @@ class InstalledPlugin {
   final PluginManifest manifest;
   final String directoryPath;
   final bool enabled;
+
+  bool get isFlutter => true;
+  bool get isWeb => false;
+  bool get isLegacy => false;
 
   String get bytecodePath {
     final separator = directoryPath.contains('\\') ? '\\' : '/';

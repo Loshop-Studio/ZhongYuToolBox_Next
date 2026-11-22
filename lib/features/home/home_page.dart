@@ -10,6 +10,7 @@ import '../../core/storage/session_manager.dart';
 import '../../data/api/exam_api.dart';
 import '../../shared/widgets/user_avatar.dart';
 import '../../shared/widgets/plugin_actions.dart';
+import '../../shared/widgets/common.dart';
 
 /// 主页：账号、未完成测评、功能入口
 class HomePage extends StatefulWidget {
@@ -120,9 +121,21 @@ class _HomePageState extends State<HomePage> {
                         'displayName': _session.displayName,
                         'userId': _session.session.userId,
                       },
-                      nativeLabel: '个人信息',
+                      nativeLabel: '安装个人信息插件',
                       nativeIcon: Icons.person_outline,
-                      onNative: () => context.push('/profile'),
+                      onNative: () async {
+                        final install = await confirmDialog(
+                          context,
+                          title: '个人信息插件未安装',
+                          content:
+                              '请先安装个人信息插件后再查看或编辑个人信息。'
+                              '可在插件管理中从索引源安装，或导入 .zytbplugin 文件。',
+                          confirmText: '前往插件管理',
+                        );
+                        if (install && context.mounted) {
+                          context.push('/plugins');
+                        }
+                      },
                     ),
                   ),
                 ),

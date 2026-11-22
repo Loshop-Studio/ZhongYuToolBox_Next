@@ -21,6 +21,8 @@ dependencies:
   html: ^0.15.4
   file_picker: ^8.1.7
   archive: ^3.6.1
+  zy_board_renderer:
+    path: packages/zy_board_renderer
   pdf: ^3.11.1
   cached_network_image: ^3.4.1
   flutter_cache_manager: ^3.5.0
@@ -40,6 +42,8 @@ dependencies:
   flutter_colorpicker: ^1.1.0
   flutter_eval: 0.8.2
   dart_eval: 0.8.5
+  sqlite3: ^3.5.2
+  sqlite3_flutter_libs: ^0.6.0+eol
 
 dev_dependencies:
   flutter_test:

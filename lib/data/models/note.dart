@@ -41,17 +41,23 @@ class NoteItem {
 
 class NoteResource {
   NoteResource({
+    required this.id,
+    required this.md5,
     required this.ossImageUrl,
     required this.pageIndex,
     required this.resourceType,
   });
 
+  final String id;
+  final String md5;
   final String ossImageUrl;
   final int pageIndex;
   final int resourceType;
 
   factory NoteResource.fromJson(Map<String, dynamic> json) {
     return NoteResource(
+      id: (json['id'] ?? '').toString(),
+      md5: (json['md5'] ?? '').toString(),
       ossImageUrl: (json['ossImageUrl'] ?? '').toString(),
       pageIndex: (json['pageIndex'] as num?)?.toInt() ?? 0,
       resourceType: (json['resourceType'] as num?)?.toInt() ?? 0,

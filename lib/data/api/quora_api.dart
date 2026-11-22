@@ -13,6 +13,7 @@ class QuoraApi {
     final data = await ApiClient.instance.request(
       '/api/services/app/Quora/GetCatalogs',
     );
+    _logResponse('GetCatalogs', data);
     final result = data is Map ? data['result'] : null;
     if (result is! List) return <QuoraCatalog>[];
     return result
@@ -49,6 +50,7 @@ class QuoraApi {
         'justWatch': justWatch,
       }),
     );
+    _logResponse('GetSessions', data);
     final result = data is Map ? data['result'] : null;
     if (result is! List) return <QuoraSession>[];
     return result
@@ -67,15 +69,9 @@ class QuoraApi {
       method: 'POST',
       data: jsonEncode({'SessionId': sessionId, 'Skip': skip, 'Take': take}),
     );
+    _logResponse('GetMessages', data);
     final result = data is Map ? data['result'] : null;
     if (result is! List) return <QuoraMessage>[];
-    if (result.isNotEmpty && result.first is Map) {
-      // 各版本 GetMessages 的头像字段名不一致，打印原始字段便于确认
-      debugPrint(
-        '[QuoraApi.getMessages] 首条消息字段: '
-        '${(result.first as Map).keys.toList()}',
-      );
-    }
     return result
         .whereType<Map>()
         .map((e) => QuoraMessage.fromJson(Map<String, dynamic>.from(e)))
@@ -83,10 +79,11 @@ class QuoraApi {
   }
 
   static Future<void> resetReadState(String sessionId) async {
-    await ApiClient.instance.request(
+    final data = await ApiClient.instance.request(
       '/api/services/app/Quora/ResetReadState',
       query: {'sessionId': sessionId},
     );
+    _logResponse('ResetReadState', data);
   }
 
   static Future<void> addMessage({
@@ -94,7 +91,7 @@ class QuoraApi {
     required String sessionId,
     String snapshot = '',
   }) async {
-    await ApiClient.instance.request(
+    final data = await ApiClient.instance.request(
       '/api/services/app/Quora/AddMessage',
       method: 'POST',
       data: jsonEncode({
@@ -103,5 +100,17 @@ class QuoraApi {
         'snapshot': snapshot,
       }),
     );
+    _logResponse('AddMessage', data);
+  }
+
+  static void _logResponse(String endpoint, Object? data) {
+    if (!kDebugMode) return;
+    String body;
+    try {
+      body = const JsonEncoder.withIndent('  ').convert(data);
+    } catch (_) {
+      body = data.toString();
+    }
+    debugPrint('[QuoraApi.$endpoint] 响应:\n$body', wrapWidth: 1024);
   }
 }

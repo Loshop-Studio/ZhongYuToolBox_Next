@@ -1,6 +1,6 @@
 name: zytb_username_example
-description: 中育 Toolbox 获取用户名示例插件
-version: 1.0.0
+description: ZhongYu Toolbox username Flutter plugin example
+version: 1.0.1
 publish_to: none
 
 environment:
