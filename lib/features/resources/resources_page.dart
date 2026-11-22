@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -65,6 +66,18 @@ class _ResourcesPageState extends State<ResourcesPage>
     if (mounted) setState(() {});
   }
 
+  Future<void> _openLocalCloudNote() async {
+    try {
+      final path = await FilePicker.platform.getDirectoryPath(
+        dialogTitle: '选择中育云笔记目录',
+      );
+      if (path == null || !mounted) return;
+      await context.push('/cloud-note-local?path=${Uri.encodeComponent(path)}');
+    } catch (error) {
+      if (mounted) showToast(context, '无法选择目录：$error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,6 +85,11 @@ class _ResourcesPageState extends State<ResourcesPage>
         title: const Text('资源'),
         actions: [
           if (_tab == 0) ...[
+            IconButton(
+              tooltip: '打开本地云笔记',
+              icon: const Icon(Icons.folder_open_outlined),
+              onPressed: _openLocalCloudNote,
+            ),
             IconButton(
               tooltip: '搜索笔记',
               icon: const Icon(Icons.search),

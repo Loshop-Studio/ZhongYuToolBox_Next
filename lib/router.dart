@@ -21,6 +21,7 @@ import 'features/linspirer/linspirer_page.dart';
 import 'features/qa/qa_detail_page.dart';
 import 'features/qa/qa_page.dart';
 import 'features/resources/pdf_import_page.dart';
+import 'features/resources/cloud_note_local_preview_page.dart';
 import 'features/resources/note_detail_page.dart';
 import 'features/resources/resources_page.dart';
 import 'features/settings/settings_page.dart';
@@ -115,6 +116,13 @@ final GoRouter appRouter = GoRouter(
       builder: (_, state) => NoteDetailPage(
         fileId: state.pathParameters['fileId'] ?? '',
         fileName: state.uri.queryParameters['name'] ?? '',
+      ),
+    ),
+    GoRoute(
+      path: '/cloud-note-local',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (_, state) => CloudNoteLocalPreviewPage(
+        path: state.uri.queryParameters['path'] ?? '',
       ),
     ),
     GoRoute(

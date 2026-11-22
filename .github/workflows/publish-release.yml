@@ -105,7 +105,7 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
       - run: flutter pub get
-      - run: flutter build apk --release
+      - run: flutter build apk --release --no-tree-shake-icons
       - name: Name APK
         run: |
           version=$(sed -n 's/^version: *\([0-9.]*\)+.*/\1/p' pubspec.yaml)
