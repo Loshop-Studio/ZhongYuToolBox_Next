@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import '../../shared/widgets/common.dart';
 import 'cloud_note_local_document.dart';
 import 'cloud_note_renderer.dart';
-import 'cloud_note_snapshot.dart';
 
 /// Standalone viewer for the native 中育云笔记 directory format.
 ///
@@ -154,37 +151,7 @@ class _CloudNoteLocalPageView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       clipBehavior: Clip.antiAlias,
-      child: FutureBuilder<CloudNoteSnapshot?>(
-        future: page.readParsedSnapshot(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final parsed = snapshot.data;
-          if (parsed != null && _hasRenderableGraph(parsed.graphSnapshot)) {
-            return CloudNoteSnapshotView(snapshot: parsed, page: page);
-          }
-          if (page.hasScreenshot) {
-            return InteractiveViewer(
-              minScale: 0.2,
-              maxScale: 8,
-              child: Center(child: Image.file(page.screenshotFile)),
-            );
-          }
-          return const Center(child: Text('该页没有可渲染的 snapshot 或截图'));
-        },
-      ),
+      child: CloudNoteLocalPagePreview(page: page),
     );
-  }
-
-  bool _hasRenderableGraph(CloudNoteGraph? graph) {
-    if (graph == null) return false;
-    if (graph.childGraph.isNotEmpty ||
-        graph.pointList.isNotEmpty ||
-        (graph.content?.isNotEmpty ?? false) ||
-        (graph.filePath?.isNotEmpty ?? false)) {
-      return true;
-    }
-    return graph.childGraph.any(_hasRenderableGraph);
   }
 }
